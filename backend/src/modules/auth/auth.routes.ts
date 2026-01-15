@@ -14,7 +14,16 @@ export default async function userRoutes(fastify: FastifyInstance) {
     },
     async (request, reply) => {
       const result = await service.signUp(request.body);
-      return reply.code(200).send(result);
+      return reply
+        .code(200)
+        .setCookie("token", result, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 7,
+        })
+        .send(result);
     }
   );
 }
