@@ -1,5 +1,8 @@
 import fastify, { FastifyError } from "fastify";
+import cookie from "@fastify/cookie";
 import prismaPlugin from "./plugins/prisma";
+
+// Routes
 import userRoutes from "./modules/auth/auth.routes";
 
 export const app = fastify({
@@ -7,6 +10,10 @@ export const app = fastify({
 });
 
 await app.register(prismaPlugin);
+app.register(cookie, {
+  secret: process.env.COOKIE_SECRET,
+  parseOptions: {},
+});
 
 // routing
 await app.register(userRoutes, { prefix: "/auth" });
