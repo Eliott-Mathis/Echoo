@@ -13,16 +13,19 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
     "@prisma/client": "6.19.2",
     "ajv": "^8.17.1",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "fastify": "^5.7.0",
     "fastify-plugin": "^5.1.0",
+    "jsonwebtoken": "^9.0.3",
     "prisma": "6.19.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.0.8",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
