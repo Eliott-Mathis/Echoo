@@ -12,3 +12,8 @@ await app.register(prismaPlugin);
 await app.register(userRoutes, { prefix: "/auth" });
 
 // Error hanlder
+app.setErrorHandler((error: FastifyError, request, reply) => {
+  reply.status(error.statusCode || 400).send({
+    error: "Une erreur est survenue",
+  });
+});
