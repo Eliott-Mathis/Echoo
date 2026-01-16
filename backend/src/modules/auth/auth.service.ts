@@ -12,6 +12,11 @@ dotenv.config();
 export class AuthService {
   constructor(private db: PrismaClient) {}
 
+  async userExists(email: string): Promise<boolean> {
+    const user = await this.db.user.findUnique({ where: {email}})
+    return user !== null
+  }
+
   async signUp({
     email,
     password,
