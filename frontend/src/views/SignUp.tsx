@@ -14,6 +14,7 @@ function OAuth2Button({ icon: Icon, className }: OA2Props) {
 }
 
 export default function SignUp() {
+  const email = useInput("");
   return (
     <AuthLayout
       title="Welcome!"
@@ -28,6 +29,14 @@ export default function SignUp() {
       </section>
       <div className="w-full flex justify-center">
         <hr className="w-[80%]" />
+      </div>
+      <div>
+        <Input
+          icon={Mail}
+          label="Email"
+          placeholder="example@echoo.now"
+          {...email}
+        />
       </div>
     </AuthLayout>
   );
