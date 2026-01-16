@@ -19,6 +19,13 @@ export default function SignUp() {
       title="Welcome!"
       caption="We're so excited for you to join our commnunity!"
     >
+      <section className="flex justify-between gap-5">
+        <OAuth2Button icon={GoogleIcon} />
+        <OAuth2Button icon={Steam} />
+        <OAuth2Button icon={Twitch} />
+        <OAuth2Button icon={DiscordIcon} />
+        <OAuth2Button icon={Apple} />
+      </section>
     </AuthLayout>
   );
 }
