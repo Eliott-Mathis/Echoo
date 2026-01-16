@@ -12,6 +12,7 @@ import Button from "@/components/Button";
 
 // Utils
 import { useInput } from "@/utils/useInput";
+import { useApi } from "@/hooks/useApi";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
@@ -29,12 +30,20 @@ function OAuth2Button({ icon: Icon, className }: OA2Props) {
 }
 
 export default function SignUp() {
+  // form
   const email = useInput("");
-  const [isLoading, setIsLoading] = useState(false);
+
+  // api handling
+  const { data, loading, error, setError, callApi } = useApi<{ message: string }>({
+    url: "http://localhost:3000/auth/email-verification", method: 'POST', body:  { email: email.value}
+  })
 
   const handleSignup = () => {
-    console.log("ok");
-    setIsLoading(true);
+    if(email.value.length === 0){
+      setError("Please enter a valid email")
+      return;
+    }
+    callApi();
   };
 
   return (
@@ -54,6 +63,7 @@ export default function SignUp() {
       </div>
       <div>
         <Input
+          error={error ? error : ''}
           icon={Mail}
           label="Email"
           placeholder="example@echoo.now"
@@ -61,7 +71,7 @@ export default function SignUp() {
         />
       </div>
       <div className="flex flex-col w-full gap-2">
-        <Button onClick={() => handleSignup()} isLoading={isLoading}>
+        <Button onClick={() => handleSignup()} isLoading={loading}>
           Sign Up
         </Button>
         <span className="flex gap-2">
