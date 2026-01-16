@@ -26,6 +26,9 @@ export default function SignUp() {
         <OAuth2Button icon={DiscordIcon} />
         <OAuth2Button icon={Apple} />
       </section>
+      <div className="w-full flex justify-center">
+        <hr className="w-[80%]" />
+      </div>
     </AuthLayout>
   );
 }
