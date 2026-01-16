@@ -1,5 +1,20 @@
+// Layout
+import AuthLayout from "@/components/layout/Auth";
+
+// Icons
 import type { IconType } from "react-icons/lib";
 import { GoogleIcon, Steam, Twitch, DiscordIcon, Apple } from "brand-logos";
+import { Mail } from "lucide-react";
+
+// Components
+import Input from "@/components/Input";
+import Button from "@/components/Button";
+
+// Utils
+import { useInput } from "@/utils/useInput";
+import { Link } from "react-router-dom";
+import { useState } from "react";
+
 interface OA2Props {
   icon: IconType;
   className?: string;
@@ -15,6 +30,13 @@ function OAuth2Button({ icon: Icon, className }: OA2Props) {
 
 export default function SignUp() {
   const email = useInput("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSignup = () => {
+    console.log("ok");
+    setIsLoading(true);
+  };
+
   return (
     <AuthLayout
       title="Welcome!"
@@ -37,6 +59,11 @@ export default function SignUp() {
           placeholder="example@echoo.now"
           {...email}
         />
+      </div>
+      <div className="flex flex-col w-full gap-2">
+        <Button onClick={() => handleSignup()} isLoading={isLoading}>
+          Sign Up
+        </Button>
       </div>
     </AuthLayout>
   );
