@@ -21,6 +21,19 @@ export const createUserSchema: JSONSchemaType<CreateUserBody> = {
   additionalProperties: false,
 };
 
+export interface SendValidationCodeToEmail {
+  email: string;
+}
+
+export const sendValidationCodeSchema: JSONSchemaType<SendValidationCodeToEmail> = {
+  type: "object",
+  properties: {
+    email: { type: "string", format: "email" as const, nullable: false },
+  },
+  required: ["email"],
+  additionalProperties: false
+}
+
 export interface LoginUserBody {
   email: string;
   password: string;
