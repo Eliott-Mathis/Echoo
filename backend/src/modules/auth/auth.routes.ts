@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { PrismaClient } from "../../generated/prisma/client";
 import { JSONSchemaType } from "ajv";
+import { HttpError } from "../../helpers/HttpError";
 import { AuthService } from "./auth.service";
 
 // Validations
@@ -9,10 +10,24 @@ import {
   createUserSchema,
   LoginUserBody,
   loginUserSchema,
+  sendValidationCodeSchema,
+  SendValidationCodeToEmail,
 } from "./auth.schema";
 
 export default async function userRoutes(fastify: FastifyInstance) {
   const service = new AuthService(fastify.db);
+
+  fastify.post<{ Body: SendValidationCodeToEmail}>("/email-verification", { schema: { body: sendValidationCodeSchema}},
+    async (request, reply) => {
+      const userExists = await service.userExists(request.body.email)
+
+      if(userExists) throw new HttpError(409, "An account already exists with this email");
+
+      // send email code verification
+
+      return reply.code(200).send({ok: true})
+    }
+  )
 
   fastify.post<{ Body: CreateUserBody }>("/signup", { schema: { body: createUserSchema }, },
     async (request, reply) => {
