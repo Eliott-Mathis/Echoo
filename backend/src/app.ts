@@ -1,4 +1,5 @@
 import fastify, { FastifyError } from "fastify";
+import cors from "@fastify/cors"
 import cookie from "@fastify/cookie";
 import prismaPlugin from "./plugins/prisma";
 
@@ -8,6 +9,11 @@ import userRoutes from "./modules/auth/auth.routes";
 export const app = fastify({
   logger: true,
 });
+
+// cors policy
+await app.register(cors, {
+  origin: ["http://localhost:5173"]
+})
 
 await app.register(prismaPlugin);
 app.register(cookie, {
