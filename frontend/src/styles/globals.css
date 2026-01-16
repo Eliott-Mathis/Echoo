@@ -202,6 +202,184 @@
   --background-primary: var(--neutral-lowest);
   --background-secondary: var(--neutral-lower);
   --border-primary: var(--neutral-low);
+  --border-secondary: var(--neutral-lower);
+
+  /* Button/Secondary (Light) */
+  --button-secondary-default-text: var(--neutral-highest);
+  --button-secondary-default-background: var(--neutral-lower);
+  --button-secondary-default-icon: var(--neutral-highest);
+  --button-secondary-default-border: var(--neutral-low);
+  --button-secondary-hover-text: var(--neutral-highest);
+  --button-secondary-hover-icon: var(--neutral-highest);
+  --button-secondary-hover-background: var(--neutral-low);
+  --button-secondary-hover-border: var(--neutral-medium);
+  --button-secondary-disable-text: var(--neutral-medium);
+  --button-secondary-disable-icon: var(--neutral-medium);
+  --button-secondary-disable-background: var(--neutral-lower);
+  --button-secondary-disable-border: var(--neutral-low);
+
+  /* Button/Primary (Light) */
+  --button-primary-default-text: var(--primary-lowest);
+  --button-primary-default-icon: var(--primary-lowest);
+  --button-primary-default-background: var(--primary-medium);
+  --button-primary-default-border: var(--primary-medium);
+  --button-primary-hover-text: var(--primary-lowest);
+  --button-primary-hover-icon: var(--primary-lowest);
+  --button-primary-hover-background: var(--primary-high);
+  --button-primary-hover-border: var(--primary-high);
+  --button-primary-disable-text: var(--primary-low);
+  --button-primary-disable-icon: var(--primary-low);
+  --button-primary-disable-background: var(--primary-lower);
+  --button-primary-disable-border: var(--primary-lower);
+
+  /* Button/Success (Light) */
+  --button-success-default-text: var(--success-lowest);
+  --button-success-default-icon: var(--success-lowest);
+  --button-success-default-background: var(--success-medium);
+  --button-success-default-border: var(--success-medium);
+  --button-success-hover-text: var(--success-lowest);
+  --button-success-hover-icon: var(--success-lowest);
+  --button-success-hover-background: var(--success-high);
+  --button-success-hover-border: var(--success-high);
+  --button-success-disable-text: var(--success-low);
+  --button-success-disable-icon: var(--success-low);
+  --button-success-disable-background: var(--success-lower);
+  --button-success-disable-border: var(--success-lower);
+
+  /* Button/Danger (Light) */
+  --button-danger-default-text: var(--danger-lowest);
+  --button-danger-default-icon: var(--danger-lowest);
+  --button-danger-default-background: var(--danger-medium);
+  --button-danger-default-border: var(--danger-medium);
+  --button-danger-hover-text: var(--danger-lowest);
+  --button-danger-hover-icon: var(--danger-lowest);
+  --button-danger-hover-background: var(--danger-high);
+  --button-danger-hover-border: var(--danger-high);
+  --button-danger-disable-text: var(--danger-low);
+  --button-danger-disable-icon: var(--danger-low);
+  --button-danger-disable-background: var(--danger-lower);
+  --button-danger-disable-border: var(--danger-lower);
+
+  /* Button/Warning (Light) */
+  --button-warning-default-text: var(--warning-lowest);
+  --button-warning-default-icon: var(--warning-lowest);
+  --button-warning-default-background: var(--warning-medium);
+  --button-warning-default-border: var(--warning-medium);
+  --button-warning-hover-text: var(--warning-lowest);
+  --button-warning-hover-icon: var(--warning-lowest);
+  --button-warning-hover-background: var(--warning-high);
+  --button-warning-hover-border: var(--warning-high);
+  --button-warning-disable-text: var(--warning-low);
+  --button-warning-disable-icon: var(--warning-low);
+  --button-warning-disable-background: var(--warning-lower);
+  --button-warning-disable-border: var(--warning-lower);
+
+  /* Button/Ghost (Light) */
+  --button-ghost-default-text: var(--neutral-highest);
+  --button-ghost-default-icon: var(--neutral-highest);
+  --button-ghost-hover-text: var(--primary-medium);
+  --button-ghost-hover-icon: var(--primary-medium);
+  --button-ghost-disable-text: var(--neutral-medium);
+  --button-ghost-disable-icon: var(--neutral-medium);
+
+  /* Input/Primary (Light) */
+  --input-primary-default-text: var(--neutral-highest);
+  --input-primary-default-placeholder: var(--neutral-medium);
+  --input-primary-default-icon: var(--neutral-medium);
+  --input-primary-default-background: var(--neutral-lowest);
+  --input-primary-default-border: var(--neutral-low);
+  --input-primary-focused-text: var(--neutral-highest);
+  --input-primary-focused-placeholder: var(--neutral-medium);
+  --input-primary-focused-icon: var(--primary-medium);
+  --input-primary-focused-background: var(--neutral-lowest);
+  --input-primary-focused-border: var(--primary-medium);
+  --input-primary-disable-text: var(--neutral-medium);
+  --input-primary-disable-placeholder: var(--neutral-low);
+  --input-primary-disable-icon: var(--neutral-low);
+  --input-primary-disable-background: var(--neutral-lower);
+  --input-primary-disable-border: var(--neutral-low);
+
+  /* Input/Success (Light) */
+  --input-success-default-text: var(--neutral-highest);
+  --input-success-default-placeholder: var(--neutral-medium);
+  --input-success-default-icon: var(--success-medium);
+  --input-success-default-background: var(--neutral-lowest);
+  --input-success-default-border: var(--success-medium);
+  --input-success-focused-text: var(--neutral-highest);
+  --input-success-focused-placeholder: var(--neutral-medium);
+  --input-success-focused-icon: var(--success-medium);
+  --input-success-focused-background: var(--neutral-lowest);
+  --input-success-focused-border: var(--success-high);
+  --input-success-disable-text: var(--neutral-medium);
+  --input-success-disable-placeholder: var(--neutral-low);
+  --input-success-disable-icon: var(--success-low);
+  --input-success-disable-background: var(--neutral-lower);
+  --input-success-disable-border: var(--success-low);
+
+  /* Input/Danger (Light) */
+  --input-danger-default-text: var(--neutral-highest);
+  --input-danger-default-placeholder: var(--neutral-medium);
+  --input-danger-default-icon: var(--danger-medium);
+  --input-danger-default-background: var(--neutral-lowest);
+  --input-danger-default-border: var(--danger-medium);
+  --input-danger-focused-text: var(--neutral-highest);
+  --input-danger-focused-placeholder: var(--neutral-medium);
+  --input-danger-focused-icon: var(--danger-medium);
+  --input-danger-focused-background: var(--neutral-lowest);
+  --input-danger-focused-border: var(--danger-high);
+  --input-danger-disable-text: var(--neutral-medium);
+  --input-danger-disable-placeholder: var(--neutral-low);
+  --input-danger-disable-icon: var(--danger-low);
+  --input-danger-disable-background: var(--neutral-lower);
+  --input-danger-disable-border: var(--danger-low);
+
+  /* Input/Warning (Light) */
+  --input-warning-default-text: var(--neutral-highest);
+  --input-warning-default-placeholder: var(--neutral-medium);
+  --input-warning-default-icon: var(--warning-medium);
+  --input-warning-default-background: var(--neutral-lowest);
+  --input-warning-default-border: var(--warning-medium);
+  --input-warning-focused-text: var(--neutral-highest);
+  --input-warning-focused-placeholder: var(--neutral-medium);
+  --input-warning-focused-icon: var(--warning-medium);
+  --input-warning-focused-background: var(--neutral-lowest);
+  --input-warning-focused-border: var(--warning-high);
+  --input-warning-disable-text: var(--neutral-medium);
+  --input-warning-disable-placeholder: var(--neutral-low);
+  --input-warning-disable-icon: var(--warning-low);
+  --input-warning-disable-background: var(--neutral-lower);
+  --input-warning-disable-border: var(--warning-low);
+
+  /* Nav & Tab/Primary (Light) */
+  --nav-tab-primary-default-text: var(--neutral-high);
+  --nav-tab-primary-default-icon: var(--neutral-high);
+  --nav-tab-primary-default-background: transparent;
+  --nav-tab-primary-hover-text: var(--neutral-highest);
+  --nav-tab-primary-hover-icon: var(--neutral-highest);
+  --nav-tab-primary-hover-background: var(--neutral-lower);
+  --nav-tab-primary-active-text: var(--primary-medium);
+  --nav-tab-primary-active-icon: var(--primary-medium);
+  --nav-tab-primary-active-background: var(--primary-lowest);
+  --nav-tab-primary-disable-text: var(--neutral-medium);
+  --nav-tab-primary-disable-icon: var(--neutral-medium);
+  --nav-tab-primary-disable-background: transparent;
+
+  /* Utilities/Gradient (Light) */
+  --utilities-gradient-primary: linear-gradient(
+    135deg,
+    var(--primary-low) 0%,
+    var(--primary-medium) 100%
+  );
+  --utilities-gradient-secondary: linear-gradient(
+    135deg,
+    var(--neutral-lower) 0%,
+    var(--neutral-low) 100%
+  );
+  --utilities-gradient-tertiary: linear-gradient(
+    135deg,
+    var(--primary-lowest) 0%,
+    var(--primary-lower) 100%
+  );
 
   /* Semantic tokens */
   --background: var(--background-primary);
@@ -287,6 +465,184 @@ body {
   --background-primary: var(--neutral-lowest);
   --background-secondary: var(--neutral-lower);
   --border-primary: var(--neutral-low);
+  --border-secondary: var(--neutral-lower);
+
+  /* Button/Secondary (Dark) */
+  --button-secondary-default-text: var(--neutral-highest);
+  --button-secondary-default-background: var(--neutral-lower);
+  --button-secondary-default-icon: var(--neutral-highest);
+  --button-secondary-default-border: var(--neutral-low);
+  --button-secondary-hover-text: var(--neutral-highest);
+  --button-secondary-hover-icon: var(--neutral-highest);
+  --button-secondary-hover-background: var(--neutral-low);
+  --button-secondary-hover-border: var(--neutral-medium);
+  --button-secondary-disable-text: var(--neutral-medium);
+  --button-secondary-disable-icon: var(--neutral-medium);
+  --button-secondary-disable-background: var(--neutral-lower);
+  --button-secondary-disable-border: var(--neutral-low);
+
+  /* Button/Primary (Dark) */
+  --button-primary-default-text: var(--primary-lowest);
+  --button-primary-default-icon: var(--primary-lowest);
+  --button-primary-default-background: var(--primary-medium);
+  --button-primary-default-border: var(--primary-medium);
+  --button-primary-hover-text: var(--primary-lowest);
+  --button-primary-hover-icon: var(--primary-lowest);
+  --button-primary-hover-background: var(--primary-high);
+  --button-primary-hover-border: var(--primary-high);
+  --button-primary-disable-text: var(--primary-low);
+  --button-primary-disable-icon: var(--primary-low);
+  --button-primary-disable-background: var(--primary-lower);
+  --button-primary-disable-border: var(--primary-lower);
+
+  /* Button/Success (Dark) */
+  --button-success-default-text: var(--success-lowest);
+  --button-success-default-icon: var(--success-lowest);
+  --button-success-default-background: var(--success-medium);
+  --button-success-default-border: var(--success-medium);
+  --button-success-hover-text: var(--success-lowest);
+  --button-success-hover-icon: var(--success-lowest);
+  --button-success-hover-background: var(--success-high);
+  --button-success-hover-border: var(--success-high);
+  --button-success-disable-text: var(--success-low);
+  --button-success-disable-icon: var(--success-low);
+  --button-success-disable-background: var(--success-lower);
+  --button-success-disable-border: var(--success-lower);
+
+  /* Button/Danger (Dark) */
+  --button-danger-default-text: var(--danger-lowest);
+  --button-danger-default-icon: var(--danger-lowest);
+  --button-danger-default-background: var(--danger-medium);
+  --button-danger-default-border: var(--danger-medium);
+  --button-danger-hover-text: var(--danger-lowest);
+  --button-danger-hover-icon: var(--danger-lowest);
+  --button-danger-hover-background: var(--danger-high);
+  --button-danger-hover-border: var(--danger-high);
+  --button-danger-disable-text: var(--danger-low);
+  --button-danger-disable-icon: var(--danger-low);
+  --button-danger-disable-background: var(--danger-lower);
+  --button-danger-disable-border: var(--danger-lower);
+
+  /* Button/Warning (Dark) */
+  --button-warning-default-text: var(--warning-lowest);
+  --button-warning-default-icon: var(--warning-lowest);
+  --button-warning-default-background: var(--warning-medium);
+  --button-warning-default-border: var(--warning-medium);
+  --button-warning-hover-text: var(--warning-lowest);
+  --button-warning-hover-icon: var(--warning-lowest);
+  --button-warning-hover-background: var(--warning-high);
+  --button-warning-hover-border: var(--warning-high);
+  --button-warning-disable-text: var(--warning-low);
+  --button-warning-disable-icon: var(--warning-low);
+  --button-warning-disable-background: var(--warning-lower);
+  --button-warning-disable-border: var(--warning-lower);
+
+  /* Button/Ghost (Dark) */
+  --button-ghost-default-text: var(--neutral-highest);
+  --button-ghost-default-icon: var(--neutral-highest);
+  --button-ghost-hover-text: var(--primary-medium);
+  --button-ghost-hover-icon: var(--primary-medium);
+  --button-ghost-disable-text: var(--neutral-medium);
+  --button-ghost-disable-icon: var(--neutral-medium);
+
+  /* Input/Primary (Dark) */
+  --input-primary-default-text: var(--neutral-highest);
+  --input-primary-default-placeholder: var(--neutral-medium);
+  --input-primary-default-icon: var(--neutral-medium);
+  --input-primary-default-background: var(--neutral-lowest);
+  --input-primary-default-border: var(--neutral-low);
+  --input-primary-focused-text: var(--neutral-highest);
+  --input-primary-focused-placeholder: var(--neutral-medium);
+  --input-primary-focused-icon: var(--primary-medium);
+  --input-primary-focused-background: var(--neutral-lowest);
+  --input-primary-focused-border: var(--primary-medium);
+  --input-primary-disable-text: var(--neutral-medium);
+  --input-primary-disable-placeholder: var(--neutral-low);
+  --input-primary-disable-icon: var(--neutral-low);
+  --input-primary-disable-background: var(--neutral-lower);
+  --input-primary-disable-border: var(--neutral-low);
+
+  /* Input/Success (Dark) */
+  --input-success-default-text: var(--neutral-highest);
+  --input-success-default-placeholder: var(--neutral-medium);
+  --input-success-default-icon: var(--success-medium);
+  --input-success-default-background: var(--neutral-lowest);
+  --input-success-default-border: var(--success-medium);
+  --input-success-focused-text: var(--neutral-highest);
+  --input-success-focused-placeholder: var(--neutral-medium);
+  --input-success-focused-icon: var(--success-medium);
+  --input-success-focused-background: var(--neutral-lowest);
+  --input-success-focused-border: var(--success-high);
+  --input-success-disable-text: var(--neutral-medium);
+  --input-success-disable-placeholder: var(--neutral-low);
+  --input-success-disable-icon: var(--success-low);
+  --input-success-disable-background: var(--neutral-lower);
+  --input-success-disable-border: var(--success-low);
+
+  /* Input/Danger (Dark) */
+  --input-danger-default-text: var(--neutral-highest);
+  --input-danger-default-placeholder: var(--neutral-medium);
+  --input-danger-default-icon: var(--danger-medium);
+  --input-danger-default-background: var(--neutral-lowest);
+  --input-danger-default-border: var(--danger-medium);
+  --input-danger-focused-text: var(--neutral-highest);
+  --input-danger-focused-placeholder: var(--neutral-medium);
+  --input-danger-focused-icon: var(--danger-medium);
+  --input-danger-focused-background: var(--neutral-lowest);
+  --input-danger-focused-border: var(--danger-high);
+  --input-danger-disable-text: var(--neutral-medium);
+  --input-danger-disable-placeholder: var(--neutral-low);
+  --input-danger-disable-icon: var(--danger-low);
+  --input-danger-disable-background: var(--neutral-lower);
+  --input-danger-disable-border: var(--danger-low);
+
+  /* Input/Warning (Dark) */
+  --input-warning-default-text: var(--neutral-highest);
+  --input-warning-default-placeholder: var(--neutral-medium);
+  --input-warning-default-icon: var(--warning-medium);
+  --input-warning-default-background: var(--neutral-lowest);
+  --input-warning-default-border: var(--warning-medium);
+  --input-warning-focused-text: var(--neutral-highest);
+  --input-warning-focused-placeholder: var(--neutral-medium);
+  --input-warning-focused-icon: var(--warning-medium);
+  --input-warning-focused-background: var(--neutral-lowest);
+  --input-warning-focused-border: var(--warning-high);
+  --input-warning-disable-text: var(--neutral-medium);
+  --input-warning-disable-placeholder: var(--neutral-low);
+  --input-warning-disable-icon: var(--warning-low);
+  --input-warning-disable-background: var(--neutral-lower);
+  --input-warning-disable-border: var(--warning-low);
+
+  /* Nav & Tab/Primary (Dark) */
+  --nav-tab-primary-default-text: var(--neutral-high);
+  --nav-tab-primary-default-icon: var(--neutral-high);
+  --nav-tab-primary-default-background: transparent;
+  --nav-tab-primary-hover-text: var(--neutral-highest);
+  --nav-tab-primary-hover-icon: var(--neutral-highest);
+  --nav-tab-primary-hover-background: var(--neutral-lower);
+  --nav-tab-primary-active-text: var(--primary-medium);
+  --nav-tab-primary-active-icon: var(--primary-medium);
+  --nav-tab-primary-active-background: var(--primary-lowest);
+  --nav-tab-primary-disable-text: var(--neutral-medium);
+  --nav-tab-primary-disable-icon: var(--neutral-medium);
+  --nav-tab-primary-disable-background: transparent;
+
+  /* Utilities/Gradient (Dark) */
+  --utilities-gradient-primary: linear-gradient(
+    135deg,
+    var(--primary-low) 0%,
+    var(--primary-medium) 100%
+  );
+  --utilities-gradient-secondary: linear-gradient(
+    135deg,
+    var(--neutral-lower) 0%,
+    var(--neutral-low) 100%
+  );
+  --utilities-gradient-tertiary: linear-gradient(
+    135deg,
+    var(--primary-lowest) 0%,
+    var(--primary-lower) 100%
+  );
 
   /* Semantic tokens */
   --background: var(--background-primary);
