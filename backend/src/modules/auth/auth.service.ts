@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
 // Validation
-import { CreateUserBody } from "./auth.schema";
+import { CreateUserBody, LoginUserBody } from "./auth.schema";
 import { HttpError } from "../../helpers/HttpError";
 
 dotenv.config();
@@ -17,13 +17,10 @@ export class AuthService {
     password,
     username,
     displayName,
+    birthDate
   }: CreateUserBody): Promise<string> {
     const user = await this.db.user.findUnique({ where: { email } });
-    if (user)
-      throw new HttpError(
-        400,
-        "Un utilisateur existe déjà avec cette adresse mail"
-      );
+    if (user) throw new HttpError(400, "Un utilisateur existe déjà avec cette adresse mail");
 
     // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -34,6 +31,7 @@ export class AuthService {
         password: hashedPassword,
         username,
         displayName,
+        birthDate: new Date(birthDate)
       },
     });
 
@@ -47,5 +45,25 @@ export class AuthService {
     });
 
     return token;
+  }
+
+  async login({email, password}: LoginUserBody): Promise<string> {
+    const user = await this.db.user.findUnique({ where: {email}})
+    if (!user) throw new HttpError(404, "Identifiants incorrectes")
+
+    // compare both password
+    const res = await bcrypt.compare(password, user.password);
+    if(!res) throw new HttpError(404, "Identifiants incorrectes")
+
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET non défini dans l'environnement");
+    }
+
+    // generate json web token
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+
+    return token
   }
 }
