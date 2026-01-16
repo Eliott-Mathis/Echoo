@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 
 // Validation
 import { CreateUserBody } from "./auth.schema";
+import { HttpError } from "../../helpers/HttpError";
 
 dotenv.config();
 
@@ -19,7 +20,10 @@ export class AuthService {
   }: CreateUserBody): Promise<string> {
     const user = await this.db.user.findUnique({ where: { email } });
     if (user)
-      throw new Error("Un utilisateur existe déjà avec cette adresse mail");
+      throw new HttpError(
+        400,
+        "Un utilisateur existe déjà avec cette adresse mail"
+      );
 
     // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -42,6 +46,6 @@ export class AuthService {
       expiresIn: "1d",
     });
 
-    return createdUser.id;
+    return token;
   }
 }
