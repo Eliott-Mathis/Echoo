@@ -64,6 +64,12 @@ export default function SignUp() {
         <Button onClick={() => handleSignup()} isLoading={isLoading}>
           Sign Up
         </Button>
+        <span className="flex gap-2">
+          <p className="text-gray-300">Already have an account?</p>
+          <Link className="text-orange-400" to={"/login"}>
+            Log In
+          </Link>
+        </span>
       </div>
     </AuthLayout>
   );
