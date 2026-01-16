@@ -45,6 +45,255 @@
   --color-background-primary: var(--background-primary);
   --color-background-secondary: var(--background-secondary);
   --color-border-primary: var(--border-primary);
+  --color-border-secondary: var(--border-secondary);
+
+  /* Button/Secondary */
+  --color-button-secondary-default-text: var(--button-secondary-default-text);
+  --color-button-secondary-default-background: var(
+    --button-secondary-default-background
+  );
+  --color-button-secondary-default-icon: var(--button-secondary-default-icon);
+  --color-button-secondary-default-border: var(
+    --button-secondary-default-border
+  );
+  --color-button-secondary-hover-text: var(--button-secondary-hover-text);
+  --color-button-secondary-hover-icon: var(--button-secondary-hover-icon);
+  --color-button-secondary-hover-background: var(
+    --button-secondary-hover-background
+  );
+  --color-button-secondary-hover-border: var(--button-secondary-hover-border);
+  --color-button-secondary-disable-text: var(--button-secondary-disable-text);
+  --color-button-secondary-disable-icon: var(--button-secondary-disable-icon);
+  --color-button-secondary-disable-background: var(
+    --button-secondary-disable-background
+  );
+  --color-button-secondary-disable-border: var(
+    --button-secondary-disable-border
+  );
+
+  /* Button/Primary */
+  --color-button-primary-default-text: var(--button-primary-default-text);
+  --color-button-primary-default-icon: var(--button-primary-default-icon);
+  --color-button-primary-default-background: var(
+    --button-primary-default-background
+  );
+  --color-button-primary-default-border: var(--button-primary-default-border);
+  --color-button-primary-hover-text: var(--button-primary-hover-text);
+  --color-button-primary-hover-icon: var(--button-primary-hover-icon);
+  --color-button-primary-hover-background: var(
+    --button-primary-hover-background
+  );
+  --color-button-primary-hover-border: var(--button-primary-hover-border);
+  --color-button-primary-disable-text: var(--button-primary-disable-text);
+  --color-button-primary-disable-icon: var(--button-primary-disable-icon);
+  --color-button-primary-disable-background: var(
+    --button-primary-disable-background
+  );
+  --color-button-primary-disable-border: var(--button-primary-disable-border);
+
+  /* Button/Success */
+  --color-button-success-default-text: var(--button-success-default-text);
+  --color-button-success-default-icon: var(--button-success-default-icon);
+  --color-button-success-default-background: var(
+    --button-success-default-background
+  );
+  --color-button-success-default-border: var(--button-success-default-border);
+  --color-button-success-hover-text: var(--button-success-hover-text);
+  --color-button-success-hover-icon: var(--button-success-hover-icon);
+  --color-button-success-hover-background: var(
+    --button-success-hover-background
+  );
+  --color-button-success-hover-border: var(--button-success-hover-border);
+  --color-button-success-disable-text: var(--button-success-disable-text);
+  --color-button-success-disable-icon: var(--button-success-disable-icon);
+  --color-button-success-disable-background: var(
+    --button-success-disable-background
+  );
+  --color-button-success-disable-border: var(--button-success-disable-border);
+
+  /* Button/Danger */
+  --color-button-danger-default-text: var(--button-danger-default-text);
+  --color-button-danger-default-icon: var(--button-danger-default-icon);
+  --color-button-danger-default-background: var(
+    --button-danger-default-background
+  );
+  --color-button-danger-default-border: var(--button-danger-default-border);
+  --color-button-danger-hover-text: var(--button-danger-hover-text);
+  --color-button-danger-hover-icon: var(--button-danger-hover-icon);
+  --color-button-danger-hover-background: var(--button-danger-hover-background);
+  --color-button-danger-hover-border: var(--button-danger-hover-border);
+  --color-button-danger-disable-text: var(--button-danger-disable-text);
+  --color-button-danger-disable-icon: var(--button-danger-disable-icon);
+  --color-button-danger-disable-background: var(
+    --button-danger-disable-background
+  );
+  --color-button-danger-disable-border: var(--button-danger-disable-border);
+
+  /* Button/Warning */
+  --color-button-warning-default-text: var(--button-warning-default-text);
+  --color-button-warning-default-icon: var(--button-warning-default-icon);
+  --color-button-warning-default-background: var(
+    --button-warning-default-background
+  );
+  --color-button-warning-default-border: var(--button-warning-default-border);
+  --color-button-warning-hover-text: var(--button-warning-hover-text);
+  --color-button-warning-hover-icon: var(--button-warning-hover-icon);
+  --color-button-warning-hover-background: var(
+    --button-warning-hover-background
+  );
+  --color-button-warning-hover-border: var(--button-warning-hover-border);
+  --color-button-warning-disable-text: var(--button-warning-disable-text);
+  --color-button-warning-disable-icon: var(--button-warning-disable-icon);
+  --color-button-warning-disable-background: var(
+    --button-warning-disable-background
+  );
+  --color-button-warning-disable-border: var(--button-warning-disable-border);
+
+  /* Button/Ghost */
+  --color-button-ghost-default-text: var(--button-ghost-default-text);
+  --color-button-ghost-default-icon: var(--button-ghost-default-icon);
+  --color-button-ghost-hover-text: var(--button-ghost-hover-text);
+  --color-button-ghost-hover-icon: var(--button-ghost-hover-icon);
+  --color-button-ghost-disable-text: var(--button-ghost-disable-text);
+  --color-button-ghost-disable-icon: var(--button-ghost-disable-icon);
+
+  /* Input/Primary */
+  --color-input-primary-default-text: var(--input-primary-default-text);
+  --color-input-primary-default-placeholder: var(
+    --input-primary-default-placeholder
+  );
+  --color-input-primary-default-icon: var(--input-primary-default-icon);
+  --color-input-primary-default-background: var(
+    --input-primary-default-background
+  );
+  --color-input-primary-default-border: var(--input-primary-default-border);
+  --color-input-primary-focused-text: var(--input-primary-focused-text);
+  --color-input-primary-focused-placeholder: var(
+    --input-primary-focused-placeholder
+  );
+  --color-input-primary-focused-icon: var(--input-primary-focused-icon);
+  --color-input-primary-focused-background: var(
+    --input-primary-focused-background
+  );
+  --color-input-primary-focused-border: var(--input-primary-focused-border);
+  --color-input-primary-disable-text: var(--input-primary-disable-text);
+  --color-input-primary-disable-placeholder: var(
+    --input-primary-disable-placeholder
+  );
+  --color-input-primary-disable-icon: var(--input-primary-disable-icon);
+  --color-input-primary-disable-background: var(
+    --input-primary-disable-background
+  );
+  --color-input-primary-disable-border: var(--input-primary-disable-border);
+
+  /* Input/Success */
+  --color-input-success-default-text: var(--input-success-default-text);
+  --color-input-success-default-placeholder: var(
+    --input-success-default-placeholder
+  );
+  --color-input-success-default-icon: var(--input-success-default-icon);
+  --color-input-success-default-background: var(
+    --input-success-default-background
+  );
+  --color-input-success-default-border: var(--input-success-default-border);
+  --color-input-success-focused-text: var(--input-success-focused-text);
+  --color-input-success-focused-placeholder: var(
+    --input-success-focused-placeholder
+  );
+  --color-input-success-focused-icon: var(--input-success-focused-icon);
+  --color-input-success-focused-background: var(
+    --input-success-focused-background
+  );
+  --color-input-success-focused-border: var(--input-success-focused-border);
+  --color-input-success-disable-text: var(--input-success-disable-text);
+  --color-input-success-disable-placeholder: var(
+    --input-success-disable-placeholder
+  );
+  --color-input-success-disable-icon: var(--input-success-disable-icon);
+  --color-input-success-disable-background: var(
+    --input-success-disable-background
+  );
+  --color-input-success-disable-border: var(--input-success-disable-border);
+
+  /* Input/Danger */
+  --color-input-danger-default-text: var(--input-danger-default-text);
+  --color-input-danger-default-placeholder: var(
+    --input-danger-default-placeholder
+  );
+  --color-input-danger-default-icon: var(--input-danger-default-icon);
+  --color-input-danger-default-background: var(
+    --input-danger-default-background
+  );
+  --color-input-danger-default-border: var(--input-danger-default-border);
+  --color-input-danger-focused-text: var(--input-danger-focused-text);
+  --color-input-danger-focused-placeholder: var(
+    --input-danger-focused-placeholder
+  );
+  --color-input-danger-focused-icon: var(--input-danger-focused-icon);
+  --color-input-danger-focused-background: var(
+    --input-danger-focused-background
+  );
+  --color-input-danger-focused-border: var(--input-danger-focused-border);
+  --color-input-danger-disable-text: var(--input-danger-disable-text);
+  --color-input-danger-disable-placeholder: var(
+    --input-danger-disable-placeholder
+  );
+  --color-input-danger-disable-icon: var(--input-danger-disable-icon);
+  --color-input-danger-disable-background: var(
+    --input-danger-disable-background
+  );
+  --color-input-danger-disable-border: var(--input-danger-disable-border);
+
+  /* Input/Warning */
+  --color-input-warning-default-text: var(--input-warning-default-text);
+  --color-input-warning-default-placeholder: var(
+    --input-warning-default-placeholder
+  );
+  --color-input-warning-default-icon: var(--input-warning-default-icon);
+  --color-input-warning-default-background: var(
+    --input-warning-default-background
+  );
+  --color-input-warning-default-border: var(--input-warning-default-border);
+  --color-input-warning-focused-text: var(--input-warning-focused-text);
+  --color-input-warning-focused-placeholder: var(
+    --input-warning-focused-placeholder
+  );
+  --color-input-warning-focused-icon: var(--input-warning-focused-icon);
+  --color-input-warning-focused-background: var(
+    --input-warning-focused-background
+  );
+  --color-input-warning-focused-border: var(--input-warning-focused-border);
+  --color-input-warning-disable-text: var(--input-warning-disable-text);
+  --color-input-warning-disable-placeholder: var(
+    --input-warning-disable-placeholder
+  );
+  --color-input-warning-disable-icon: var(--input-warning-disable-icon);
+  --color-input-warning-disable-background: var(
+    --input-warning-disable-background
+  );
+  --color-input-warning-disable-border: var(--input-warning-disable-border);
+
+  /* Nav & Tab/Primary */
+  --color-nav-tab-primary-default-text: var(--nav-tab-primary-default-text);
+  --color-nav-tab-primary-default-icon: var(--nav-tab-primary-default-icon);
+  --color-nav-tab-primary-default-background: var(
+    --nav-tab-primary-default-background
+  );
+  --color-nav-tab-primary-hover-text: var(--nav-tab-primary-hover-text);
+  --color-nav-tab-primary-hover-icon: var(--nav-tab-primary-hover-icon);
+  --color-nav-tab-primary-hover-background: var(
+    --nav-tab-primary-hover-background
+  );
+  --color-nav-tab-primary-active-text: var(--nav-tab-primary-active-text);
+  --color-nav-tab-primary-active-icon: var(--nav-tab-primary-active-icon);
+  --color-nav-tab-primary-active-background: var(
+    --nav-tab-primary-active-background
+  );
+  --color-nav-tab-primary-disable-text: var(--nav-tab-primary-disable-text);
+  --color-nav-tab-primary-disable-icon: var(--nav-tab-primary-disable-icon);
+  --color-nav-tab-primary-disable-background: var(
+    --nav-tab-primary-disable-background
+  );
 
   /* Legacy palette */
   --color-black-default: #000000;
