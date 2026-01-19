@@ -12,7 +12,7 @@ import Button from "@/components/Button";
 
 // Utils
 import { useInput } from "@/utils/useInput";
-import { useSignUpValidation } from "@/hooks/useAuth";
+import { useSendVerificationOtp } from "@/hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -31,14 +31,13 @@ function OAuth2Button({ icon: Icon, className }: OA2Props) {
 
 export default function SignUp() {
   const [errorMessage, setErrorMessage] = useState("")
-  const { mutateAsync, isPending} = useSignUpValidation(setErrorMessage)
+  const { mutateAsync, isPending} = useSendVerificationOtp(setErrorMessage)
 
   // nav
   const navigate = useNavigate();  
 
   // form
   const email = useInput("");
-
   const handleSignup = async() => {
     if(email.value.length === 0){
       setErrorMessage("Please enter a valid email")
@@ -46,16 +45,13 @@ export default function SignUp() {
     }
 
     setErrorMessage("")
-    const data = await mutateAsync({
+    localStorage.removeItem("pendingOtp")
+    await mutateAsync({
       email: email.value
     })
 
-    if(data.ok && data.token) {
-      localStorage.setItem('authToken', data.token)
-      navigate("/email-verification")
-    } else {
-      setErrorMessage("An error has occured")
-    }
+    localStorage.setItem("pendingEmail", email.value)
+    navigate("/email-verification")
 
   };
 
