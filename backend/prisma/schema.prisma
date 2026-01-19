@@ -70,7 +70,7 @@ enum MentionType {
 model User {
   id           String     @id @default(cuid())
   email        String     @unique
-  password     String
+  password     String?
   isVerified   Boolean    @default(false)
   birthDate    DateTime
   username     String     @unique
@@ -100,6 +100,10 @@ model User {
   // Indicateurs temps réel (gérés en mémoire/Redis, mais backup DB)
   typingStates        TypingState[]
 
+  // Better Auth relations
+  accounts           Account[]
+  sessions           Session[]
+
   @@index([email])
   @@index([username])
   @@index([status])
@@ -111,6 +115,49 @@ model UserVerification {
   email String @unique
   code Int
   isVerified Boolean @default(false)
+}
+
+model Account {
+  id                     String   @id @default(cuid())
+  userId                 String
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId              String
+  providerId             String
+  accessToken            String?
+  refreshToken           String?
+  accessTokenExpiresAt   DateTime?
+  refreshTokenExpiresAt  DateTime?
+  scope                  String?
+  idToken                String?
+  password               String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Verification {
+  id        String   @id @default(cuid())
+  identifier String   @unique
+  value     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 
