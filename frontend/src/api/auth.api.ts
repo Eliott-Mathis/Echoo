@@ -1,28 +1,36 @@
+import { authClient } from "@/lib/authClient";
 import { apiClient } from "./client";
-import { API_ROUTES } from "./endpoints";
 
-interface DefaultApiResponse {
-    ok: boolean;
-}
-
-interface ValidationMailResponse {
-    ok: boolean;
-    token: string
-}
+type DefaultApiResponse = unknown;
 
 export const AuthAPI = {
-    validation: async(payload: {email: string}): Promise<ValidationMailResponse> => {
-        const { data } = await apiClient.post(API_ROUTES.auth.validation, payload)
+    sendVerificationOtp: async (payload: { email: string }) => {
+        const { data, error } = await authClient.emailOtp.sendVerificationOtp({
+            email: payload.email,
+            type: "sign-in",
+        });
+
+        if (error) throw error;
         return data;
     },
 
-    check: async(payload: {code: number, token: string}): Promise<DefaultApiResponse> => {
-        const { data } = await apiClient.post(API_ROUTES.auth.check, payload)
+    checkVerificationOtp: async (payload: { email: string; code: string }) => {
+        const { data } = await apiClient.post("/auth/check-otp", {
+            email: payload.email,
+            code: payload.code,
+        });
         return data;
     },
 
-    signUp: async (payload: {email: string}): Promise<DefaultApiResponse> => {
-        const { data } = await apiClient.post(API_ROUTES.auth.signup, payload)
+    completeSignUp: async (payload: {
+        email: string;
+        code: string;
+        password: string;
+        username: string;
+        displayName: string;
+        birthDate: string;
+    }): Promise<DefaultApiResponse> => {
+        const { data } = await apiClient.post("/auth/complete-signup", payload);
         return data;
-    }
-}
+    },
+};
