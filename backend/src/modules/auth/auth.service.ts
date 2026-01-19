@@ -72,6 +72,19 @@ export class AuthService {
     
   }
 
+  async checkCode(email: string, code: number) {
+    // get "validation" account
+    const account = await this.db.userVerification.findFirst({ where: {email}})
+
+    if(!account) throw new HttpError(404, "Unknown email address")
+
+    // compare both code
+    if(code !== account.code) throw new HttpError(403, "Invalid code")
+
+    // change account as verified
+    await this.db.userVerification.update({ where: {email}, data: {isVerified: true}})
+  }
+
   async signUp({
     email,
     password,
