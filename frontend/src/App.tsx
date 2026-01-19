@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignUp from "./views/SignUp";
 import EmailVerification from "./views/EmailVerification";
 import CompleteSignup from "./views/CompleteSignup";
+import Login from "./views/Login";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/signup" Component={SignUp} />
         <Route path="/email-verification" Component={EmailVerification}/>
         <Route path="/complete-signup" Component={CompleteSignup}/>
+        <Route path="/login" Component={Login}/>
       </Routes>
     </BrowserRouter>
   );
