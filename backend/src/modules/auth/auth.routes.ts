@@ -6,6 +6,8 @@ import { AuthService } from "./auth.service";
 
 // Validations
 import {
+  CheckValidationCode,
+  checkValidationCodeSchema,
   CreateUserBody,
   createUserSchema,
   LoginUserBody,
@@ -21,9 +23,16 @@ export default async function userRoutes(fastify: FastifyInstance) {
     async (request, reply) => {
       const userExists = await service.userExists(request.body.email)
 
+      
       if(userExists) throw new HttpError(409, "An account already exists with this email");
 
       // send email code verification
+      const token = await service.sendVerificationMail(request.body.email)
+
+      return reply.code(200).send({ok: true, token})
+    }
+  )
+
 
       return reply.code(200).send({ok: true})
     }
