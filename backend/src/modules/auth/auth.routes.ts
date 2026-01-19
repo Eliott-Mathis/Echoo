@@ -22,7 +22,6 @@ export default async function userRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: SendValidationCodeToEmail}>("/email-verification", { schema: { body: sendValidationCodeSchema}},
     async (request, reply) => {
       const userExists = await service.userExists(request.body.email)
-
       
       if(userExists) throw new HttpError(409, "An account already exists with this email");
 
@@ -33,6 +32,14 @@ export default async function userRoutes(fastify: FastifyInstance) {
     }
   )
 
+  fastify.post<{ Body: CheckValidationCode}>("/check-code", {schema: { body: checkValidationCodeSchema}}, 
+    async (request, reply) => {
+      // check jwt
+      const email = await service.validJwt(request.body.token)
+
+      if(!email) throw new HttpError(400, "An error has occured")
+
+      await service.checkCode(email, request.body.code)
 
       return reply.code(200).send({ok: true})
     }

@@ -71,6 +71,7 @@ export class AuthService {
     return token;
     
   }
+
   async signUp({
     email,
     password,
