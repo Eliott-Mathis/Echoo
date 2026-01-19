@@ -12,7 +12,8 @@ export const app = fastify({
 
 // cors policy
 await app.register(cors, {
-  origin: ["http://localhost:5173"]
+  origin: ["http://localhost:5173"],
+  credentials: true,
 })
 
 await app.register(prismaPlugin);
