@@ -14,14 +14,6 @@ export const AuthAPI = {
         return data;
     },
 
-    checkVerificationOtp: async (payload: { email: string; code: string }) => {
-        const { data } = await apiClient.post("/auth/check-otp", {
-            email: payload.email,
-            code: payload.code,
-        });
-        return data;
-    },
-
     completeSignUp: async (payload: {
         email: string;
         code: string;
