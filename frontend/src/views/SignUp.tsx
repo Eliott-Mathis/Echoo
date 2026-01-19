@@ -12,8 +12,8 @@ import Button from "@/components/Button";
 
 // Utils
 import { useInput } from "@/utils/useInput";
-import { useApi } from "@/hooks/useApi";
-import { Link } from "react-router-dom";
+import { useSignUpValidation } from "@/hooks/useAuth";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 interface OA2Props {
@@ -30,20 +30,30 @@ function OAuth2Button({ icon: Icon, className }: OA2Props) {
 }
 
 export default function SignUp() {
+  const [errorMessage, setErrorMessage] = useState("")
+  const { mutateAsync, isPending} = useSignUpValidation(setErrorMessage)
+
+  // nav
+  const navigate = useNavigate();  
+
   // form
   const email = useInput("");
 
-  // api handling
-  const { data, loading, error, setError, callApi } = useApi<{ message: string }>({
-    url: "http://localhost:3000/auth/email-verification", method: 'POST', body:  { email: email.value}
-  })
-
-  const handleSignup = () => {
+  const handleSignup = async() => {
     if(email.value.length === 0){
-      setError("Please enter a valid email")
+      setErrorMessage("Please enter a valid email")
       return;
     }
-    callApi();
+
+    setErrorMessage("")
+    const data = await mutateAsync({
+      email: email.value
+    })
+
+    if(data.ok) {
+      navigate("/")
+    }
+
   };
 
   return (
@@ -63,7 +73,7 @@ export default function SignUp() {
       </div>
       <div>
         <Input
-          error={error ? error : ''}
+          error={errorMessage}
           icon={Mail}
           label="Email"
           placeholder="example@echoo.now"
@@ -71,7 +81,7 @@ export default function SignUp() {
         />
       </div>
       <div className="flex flex-col w-full gap-2">
-        <Button onClick={() => handleSignup()} isLoading={loading}>
+        <Button onClick={() => handleSignup()} isLoading={isPending}>
           Sign Up
         </Button>
         <span className="flex gap-2">
