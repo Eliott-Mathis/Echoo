@@ -13,11 +13,6 @@ interface CompleteSignupBody {
   birthDate: string;
 }
 
-interface CheckOtpBody {
-  email: string;
-  code: string;
-}
-
 const completeSignupSchema: JSONSchemaType<CompleteSignupBody> = {
   type: "object",
   properties: {
@@ -29,16 +24,6 @@ const completeSignupSchema: JSONSchemaType<CompleteSignupBody> = {
     birthDate: { type: "string", format: "date", nullable: false },
   },
   required: ["email", "code", "password", "username", "displayName", "birthDate"],
-  additionalProperties: false,
-};
-
-const checkOtpSchema: JSONSchemaType<CheckOtpBody> = {
-  type: "object",
-  properties: {
-    email: { type: "string", format: "email" as const, nullable: false },
-    code: { type: "string", minLength: 4, nullable: false },
-  },
-  required: ["email", "code"],
   additionalProperties: false,
 };
 
@@ -86,16 +71,6 @@ const verifySignupOtp = async (
 };
 
 export default async function signupRoutes(fastify: FastifyInstance) {
-  fastify.post<{ Body: CheckOtpBody }>(
-    "/check-otp",
-    { schema: { body: checkOtpSchema } },
-    async (request, reply) => {
-      const { email, code } = request.body;
-      await verifySignupOtp(fastify.db, email, code);
-      reply.code(200).send({ ok: true });
-    }
-  );
-
   fastify.post<{ Body: CompleteSignupBody }>(
     "/complete-signup",
     { schema: { body: completeSignupSchema } },
