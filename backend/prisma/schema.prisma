@@ -14,14 +14,392 @@ datasource db {
   // url = env("DIRECT_URL")
 }
 
+///////////////////////////////////////////////////////////////////////////////////
+// ENUMS
+///////////////////////////////////////////////////////////////////////////////////
+
+enum UserStatus {
+  ONLINE
+  OFFLINE
+  IDLE
+  DO_NOT_DISTURB
+  INVISIBLE
+}
+
+enum RelationshipType {
+  PENDING_OUTGOING  // Tu as envoyé la demande
+  PENDING_INCOMING  // Tu as reçu la demande
+  FRIENDS           // Amis mutuels
+  BLOCKED
+}
+
+enum MessageType {
+  DEFAULT           // Message texte normal
+  SYSTEM            // Message système (X a rejoint, X a quitté, etc.)
+  RECIPIENT_ADD     // Quelqu'un ajouté au groupe
+  RECIPIENT_REMOVE  // Quelqu'un retiré du groupe
+  CALL              // Appel
+  GROUP_NAME_CHANGE // Nom du groupe changé
+  GROUP_ICON_CHANGE // Icône du groupe changée
+  PIN_ADD           // Message épinglé
+}
+
+enum ConversationType {
+  DM                // Conversation 1-à-1
+  GROUP_DM          // Groupe de discussion
+}
+
+enum NotificationType {
+  MESSAGE           // Nouveau message
+  FRIEND_REQUEST    // Demande d'ami
+  FRIEND_ACCEPTED   // Demande acceptée
+  MENTION           // Mentionné dans un message
+  SYSTEM            // Notification système
+}
+
+enum MentionType {
+  USER              // @user
+  HERE              // @here
+  EVERYONE          // @everyone
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// USER & AUTHENTICATION
+///////////////////////////////////////////////////////////////////////////////////
+
 model User {
-  id  String @id @default(cuid())
-  email String @unique
-  password String
-  isVerified Boolean @default(false)
-  birthDate DateTime
-  username String @unique
-  displayName String  
-  avatarUrl String?
-  bio String?
+  id           String     @id @default(cuid())
+  email        String     @unique
+  password     String
+  isVerified   Boolean    @default(false)
+  birthDate    DateTime
+  username     String     @unique
+  displayName  String
+  avatarUrl    String?
+  bannerUrl    String?
+  bio          String?    @db.VarChar(200)
+  status       UserStatus @default(OFFLINE)
+  customStatus String?    @db.VarChar(60) // "Playing ..."
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  lastOnlineAt DateTime?
+
+  // Relations sociales
+  relationships       Relationship[] @relation("RelationshipOwner")
+  relatedTo           Relationship[] @relation("RelationshipTarget")
+
+  // Conversations & Messages
+  conversationMembers ConversationMember[]
+  messages            Message[]
+  reactions           Reaction[]
+
+  // Notifications & Settings
+  notifications       Notification[]
+  settings            UserSettings?
+
+  // Indicateurs temps réel (gérés en mémoire/Redis, mais backup DB)
+  typingStates        TypingState[]
+
+  @@index([email])
+  @@index([username])
+  @@index([status])
+  @@index([lastOnlineAt])
+}
+
+model UserSettings {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // TODO: Ajouter les paramètres au fur et à mesure
+  // theme: String @default("dark")
+  // locale: String @default("fr")
+  // enableNotifications: Boolean @default(true)
+  // showOnlineStatus: Boolean @default(true)
+  // allowDMsFromNonFriends: Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// RELATIONSHIPS (Amis, Demandes, Blocages)
+///////////////////////////////////////////////////////////////////////////////////
+// 
+// Design: Une seule table pour gérer toutes les relations entre utilisateurs.
+// Avantages:
+// - Requêtes simples: "Donne-moi toutes mes relations" = 1 query
+// - Pas de duplication: chaque relation existe 2x (une par perspective)
+// - Blocage simple: si type = BLOCKED, l'autre ne peut plus interagir
+//
+// Exemple: Alice envoie une demande à Bob
+// → Row 1: ownerId=Alice, targetId=Bob, type=PENDING_OUTGOING
+// → Row 2: ownerId=Bob, targetId=Alice, type=PENDING_INCOMING
+//
+// Bob accepte:
+// → Les deux rows passent à type=FRIENDS
+
+model Relationship {
+  id        String           @id @default(cuid())
+  ownerId   String
+  owner     User             @relation("RelationshipOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  targetId  String
+  target    User             @relation("RelationshipTarget", fields: [targetId], references: [id], onDelete: Cascade)
+  type      RelationshipType
+  nickname  String?          @db.VarChar(32) // Surnom personnalisé pour cet ami
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@unique([ownerId, targetId])
+  @@index([ownerId, type]) // "Mes amis", "Mes demandes en attente"
+  @@index([targetId])
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// CONVERSATIONS (DMs & Group DMs)
+///////////////////////////////////////////////////////////////////////////////////
+//
+// Design unifié pour DM 1-1 et groupes:
+// - DM 1-1: type=DM, exactement 2 membres, pas de nom/icône
+// - Groupe: type=GROUP_DM, 2-10 membres, nom/icône optionnels
+//
+// Problèmes résolus:
+// - Réouverture de conversation: on ne supprime jamais, on utilise `leftAt`
+// - Conversation "supprimée": chaque membre a son propre `isHidden`
+// - Performance: index composite pour le tri par dernier message
+
+model Conversation {
+  id            String           @id @default(cuid())
+  type          ConversationType @default(DM)
+  name          String?          @db.VarChar(100) // Null pour DM 1-1, optionnel pour groupes
+  iconUrl       String?          // Icône personnalisée du groupe
+  ownerId       String?          // Créateur du groupe (null pour DM 1-1)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  lastMessageAt DateTime?        // Dénormalisé pour tri rapide
+
+  members       ConversationMember[]
+  messages      Message[]
+  pinnedMessages PinnedMessage[]
+
+  @@index([type])
+  @@index([lastMessageAt(sort: Desc)]) // Tri conversations récentes
+}
+
+model ConversationMember {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // États du membre
+  joinedAt       DateTime     @default(now())
+  leftAt         DateTime?    // Null = toujours membre, sinon = a quitté
+  isHidden       Boolean      @default(false) // "Fermer" la conv sans la quitter
+  isMuted        Boolean      @default(false)
+  muteUntil      DateTime?    // Mute temporaire
+
+  // Lecture
+  lastReadAt     DateTime?    // Dernière fois qu'il a lu
+  lastReadMsgId  String?      // ID du dernier message lu (plus précis)
+
+  // Permissions groupe
+  canInvite      Boolean      @default(true) // Peut ajouter des gens au groupe
+
+  @@unique([conversationId, userId])
+  @@index([userId, isHidden]) // "Mes conversations visibles"
+  @@index([conversationId])
+  @@index([userId, leftAt])   // "Mes conversations actives"
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// MESSAGES
+///////////////////////////////////////////////////////////////////////////////////
+//
+// Design pensé pour:
+// - Pagination cursor-based (pas d'offset, utilise createdAt + id)
+// - Soft delete: isDeleted=true garde la structure pour les réponses
+// - Édition: garde l'historique via editedAt
+// - Recherche: index full-text possible sur content
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  authorId       String
+  author         User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  // Contenu
+  content        String?      @db.Text // Null si message système ou supprimé
+  type           MessageType  @default(DEFAULT)
+
+  // États
+  isEdited       Boolean      @default(false)
+  editedAt       DateTime?    // Quand a été édité
+  isDeleted      Boolean      @default(false)
+  deletedAt      DateTime?    // Quand a été supprimé
+
+  // Système de réponses (thread simple)
+  replyToId      String?
+  replyTo        Message?     @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies        Message[]    @relation("MessageReplies")
+
+  // Métadonnées système (pour MessageType != DEFAULT)
+  systemData     Json?        // Ex: { "addedUserId": "xxx" } pour RECIPIENT_ADD
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  // Relations
+  attachments    Attachment[]
+  reactions      Reaction[]
+  mentions       Mention[]
+  pinnedIn       PinnedMessage?
+
+  // Index composites pour pagination performante
+  @@index([conversationId, createdAt(sort: Desc)])
+  @@index([conversationId, id])
+  @@index([authorId])
+  @@index([replyToId])
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// ATTACHMENTS (Fichiers, Images, etc.)
+///////////////////////////////////////////////////////////////////////////////////
+
+model Attachment {
+  id        String   @id @default(cuid())
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  // Fichier
+  url       String   // URL du fichier
+  filename  String   @db.VarChar(255)
+  fileSize  Int      // En bytes
+  mimeType  String   @db.VarChar(127)
+
+  // Métadonnées média (images/vidéos)
+  width     Int?
+  height    Int?
+  duration  Int?     // Durée en secondes pour vidéso/audios etc.
+
+  createdAt DateTime @default(now())
+
+  @@index([messageId])
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// REACTIONS
+///////////////////////////////////////////////////////////////////////////////////
+//
+// Design simple mais extensible:
+// - emoji: soit unicode ("👍"), soit ID custom (":custom_123:")
+// - Un user ne peut réagir qu'une fois avec le même emoji
+
+model Reaction {
+  id        String   @id @default(cuid())
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emoji     String   @db.VarChar(64) // Unicode ou ID custom emoji
+  createdAt DateTime @default(now())
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
+  @@index([userId])
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// MENTIONS
+///////////////////////////////////////////////////////////////////////////////////
+//
+// Stocke les mentions pour:
+// - Notifications ciblées
+// - Highlight dans l'UI
+// - Compteur "X mentions non lues"
+
+model Mention {
+  id              String      @id @default(cuid())
+  messageId       String
+  message         Message     @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  type            MentionType
+  mentionedUserId String?     // Null si type = EVERYONE
+  // Position dans le message pour highlight précis
+  startIndex      Int?
+  endIndex        Int?
+  createdAt       DateTime    @default(now())
+
+  @@index([messageId])
+  @@index([mentionedUserId]) // "Messages où je suis mentionné"
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// PINNED MESSAGES
+///////////////////////////////////////////////////////////////////////////////////
+
+model PinnedMessage {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  messageId      String       @unique // Un message ne peut être pin qu'une fois
+  message        Message      @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  pinnedById     String       // Qui a pin
+  pinnedAt       DateTime     @default(now())
+
+  @@unique([conversationId, messageId])
+  @@index([conversationId])
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// TYPING INDICATORS
+///////////////////////////////////////////////////////////////////////////////////
+
+model TypingState {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversationId String
+  startedAt      DateTime @default(now())
+  expiresAt      DateTime // Auto-expire après ~10 secondes
+
+  @@unique([userId, conversationId])
+  @@index([conversationId])
+  @@index([expiresAt]) // Pour cleanup batch
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// NOTIFICATIONS
+///////////////////////////////////////////////////////////////////////////////////
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  
+  // Contenu
+  title     String           @db.VarChar(100)
+  body      String?          @db.VarChar(500)
+  imageUrl  String?          // Avatar ou image contextuelle
+  
+  // Données structurées selon le type
+  // Ex MESSAGE: { conversationId, messageId, senderId }
+  // Ex FRIEND_REQUEST: { fromUserId }
+  data      Json?
+  
+  // Action au clic (deep link)
+  actionUrl String?          // Ex: "/conversations/xxx" ou "/friends"
+  
+  // États
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  deletedAt DateTime?        // Soft delete
+
+  createdAt DateTime         @default(now())
+
+  @@index([userId, isRead, createdAt(sort: Desc)]) // Notifs non lues récentes
+  @@index([userId, createdAt(sort: Desc)])         // Toutes les notifs
+  @@index([type])
 }
