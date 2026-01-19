@@ -34,6 +34,21 @@ export const sendValidationCodeSchema: JSONSchemaType<SendValidationCodeToEmail>
   additionalProperties: false
 }
 
+export interface CheckValidationCode {
+  code: number;
+  token: string;
+}
+
+export const checkValidationCodeSchema: JSONSchemaType<CheckValidationCode> = {
+  type: "object",
+  properties: {
+    code: { type: "number", format: "email" as const, nullable: false },
+    token: {type: "string", nullable: false}
+  },
+  required: ["code", "token"],
+  additionalProperties: false
+}
+
 export interface LoginUserBody {
   email: string;
   password: string;
