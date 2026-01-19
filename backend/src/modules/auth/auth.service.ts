@@ -22,6 +22,19 @@ export class AuthService {
     return user !== null
   }
 
+  async validJwt(token: string): Promise<any> {
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET non défini dans l'environnement");
+    }
+
+    try {
+      const payload: any = jwt.verify(token, process.env.JWT_SECRET);
+      return payload["email"];
+    } catch (err) {
+      return "";
+    }
+  }
+
   async sendVerificationMail(email: string) {
     // generate a 6 digits code
     const random = numberGenerator(6);
