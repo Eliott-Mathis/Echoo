@@ -20,3 +20,14 @@ export const useCompleteSignUp = (onError?: (message: string) => void) => {
         },
     });
 };
+
+// Login hook
+export const useSignIn = (onError?: (message: string) => void) => {
+    return useMutation({
+        mutationFn: AuthAPI.signIn,
+        onError: (error: any) => {
+            const message = error?.message ?? "Invalid email or password";
+            onError?.(message);
+        },
+    });
+};
