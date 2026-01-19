@@ -944,3 +944,14 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* globals.css ou index.css */
+.no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner {
+  -moz-appearance: textfield; /* Firefox */
+}
