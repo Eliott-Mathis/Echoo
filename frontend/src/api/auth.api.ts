@@ -4,6 +4,12 @@ import { apiClient } from "./client";
 type DefaultApiResponse = unknown;
 
 export const AuthAPI = {
+    // Check if email is already taken
+    checkEmail: async (payload: { email: string }): Promise<{ exists: boolean }> => {
+        const { data } = await apiClient.post("/auth/check-email", payload);
+        return data;
+    },
+
     // Sign up - send OTP for email verification
     sendVerificationOtp: async (payload: { email: string }) => {
         const { data, error } = await authClient.emailOtp.sendVerificationOtp({

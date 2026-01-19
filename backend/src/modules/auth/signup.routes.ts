@@ -71,6 +71,30 @@ const verifySignupOtp = async (
 };
 
 export default async function signupRoutes(fastify: FastifyInstance) {
+  // Check if email is already taken
+  fastify.post<{ Body: { email: string } }>(
+    "/check-email",
+    {
+      schema: {
+        body: {
+          type: "object",
+          properties: {
+            email: { type: "string", format: "email" },
+          },
+          required: ["email"],
+        },
+      },
+    },
+    async (request, reply) => {
+      const { email } = request.body;
+      const existingUser = await fastify.db.user.findUnique({
+        where: { email: email.toLowerCase() },
+      });
+
+      return reply.send({ exists: !!existingUser });
+    }
+  );
+
   fastify.post<{ Body: CompleteSignupBody }>(
     "/complete-signup",
     { schema: { body: completeSignupSchema } },

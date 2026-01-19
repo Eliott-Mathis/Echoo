@@ -12,7 +12,7 @@ import Button from "@/components/Button";
 
 // Utils
 import { useInput } from "@/utils/useInput";
-import { useSendVerificationOtp } from "@/hooks/useAuth";
+import { useSendVerificationOtp, useCheckEmail } from "@/hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -31,7 +31,10 @@ function OAuth2Button({ icon: Icon, className }: OA2Props) {
 
 export default function SignUp() {
   const [errorMessage, setErrorMessage] = useState("")
-  const { mutateAsync, isPending} = useSendVerificationOtp(setErrorMessage)
+  const { mutateAsync: checkEmail, isPending: isCheckingEmail } = useCheckEmail(setErrorMessage)
+  const { mutateAsync: sendOtp, isPending: isSendingOtp } = useSendVerificationOtp(setErrorMessage)
+
+  const isPending = isCheckingEmail || isSendingOtp;
 
   // nav
   const navigate = useNavigate();  
@@ -45,8 +48,16 @@ export default function SignUp() {
     }
 
     setErrorMessage("")
+    
+    // Check if email is already taken
+    const result = await checkEmail({ email: email.value });
+    if (result?.exists) {
+      setErrorMessage("This email is already registered. Please log in instead.")
+      return;
+    }
+
     localStorage.removeItem("pendingOtp")
-    await mutateAsync({
+    await sendOtp({
       email: email.value
     })
 
