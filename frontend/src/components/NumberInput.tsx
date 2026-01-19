@@ -1,6 +1,6 @@
 import { useRef, useState } from "react"
 
-export default function NumberInput({ qty, onComplete }: { qty: number, onComplete: (n: number) => void }) {
+export default function NumberInput({ qty, onComplete }: { qty: number, onComplete: (code: string) => void }) {
     const inputsRef = useRef<HTMLInputElement[]>([])
     const [values, setValues] = useState<string[]>(Array(qty).fill(""));
 
@@ -22,7 +22,7 @@ export default function NumberInput({ qty, onComplete }: { qty: number, onComple
         } 
 
         if (idx === qty - 1 && value) {
-            const finalValue = parseInt(newValues.join(""));
+            const finalValue = newValues.join("");
             onComplete(finalValue);
         }
     }
