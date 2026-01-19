@@ -11,16 +11,6 @@ export const useSendVerificationOtp = (onError?: (message: string) => void) => {
     });
 };
 
-export const useCheckVerificationOtp = (onError?: (message: string) => void) => {
-    return useMutation({
-        mutationFn: AuthAPI.checkVerificationOtp,
-        onError: (error: any) => {
-            const message = error?.message ?? "Une erreur est survenue";
-            onError?.(message);
-        },
-    });
-};
-
 export const useCompleteSignUp = (onError?: (message: string) => void) => {
     return useMutation({
         mutationFn: AuthAPI.completeSignUp,
