@@ -10,7 +10,16 @@ export const useSignUpValidation = (onError?: (message: string) => void) => {
             onError?.(message);
         }
     })
-    
+}
+
+export const useSignUpCodeCheck = (onError?: (message: string) => void) => {
+    return useMutation({
+        mutationFn: AuthAPI.check,
+        onError: (error: AxiosError<any>) => {
+            const message = error.response?.data.message ?? "Une erreur est survenue";
+            onError?.(message);
+        }
+    })
 }
 
 export const useSignUp = () => {

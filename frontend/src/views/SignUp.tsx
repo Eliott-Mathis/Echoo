@@ -50,8 +50,11 @@ export default function SignUp() {
       email: email.value
     })
 
-    if(data.ok) {
-      navigate("/")
+    if(data.ok && data.token) {
+      localStorage.setItem('authToken', data.token)
+      navigate("/email-verification")
+    } else {
+      setErrorMessage("An error has occured")
     }
 
   };
