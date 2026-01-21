@@ -1,6 +1,7 @@
 import { Rabbit, Search, UsersRound } from "lucide-react";
 import FriendListItem from "@/components/friends/FriendListItem";
 import SidebarNavTab from "@/components/friends/SidebarNavTab";
+import UserControlCard from "@/components/friends/UserControlCard";
 import type { UserStatus } from "@/types/userStatus";
 
 const friendItems: Array<{ id: number; name: string; status: UserStatus }> = [
@@ -89,7 +90,7 @@ export default function FriendsSidebar() {
           className="w-full bg-transparent text-sm text-input-primary-default-text placeholder:text-input-primary-default-placeholder outline-none"
         />
       </label>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 flex-1">
         <div className="tabs mt-2 mb-4 flex flex-col gap-2">
           <SidebarNavTab
             to="/friends/addfriend"
@@ -116,6 +117,7 @@ export default function FriendsSidebar() {
           />
         ))}
       </div>
+      <UserControlCard name="Matod" username="mathod98" presence="online" />
     </aside>
   );
 }
