@@ -9,7 +9,7 @@ export default function AddFriendTab() {
           You can add friends using their Echoo username (not display name!).
         </p>
       </div>
-      <div className="inputContainer flex items-center gap-4 w-full">
+      <div className="inputContainer flex items-center gap-3 w-full">
         <div className="bg-background-secondary border border-border-primary rounded-lg px-4 py-2 flex items-center gap-1 w-full">
           <input
             type="text"
