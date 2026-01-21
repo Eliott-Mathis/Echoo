@@ -13,7 +13,7 @@ export default async function relationshipRoutes(fastify: FastifyInstance) {
 
     const pendingCount = await fastify.db.relationship.count({
       where: {
-        ownerId: session.user.id,
+        targetId: session.user.id,
         type: RelationshipType.PENDING,
       },
     });
