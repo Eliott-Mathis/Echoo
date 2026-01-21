@@ -62,7 +62,7 @@ export default function FriendsTab() {
           {friendTabs.map((tab) => {
             const isActive = tab.slug === activeTab;
             const baseClasses =
-              "text-sm font-semibold px-3 py-1 rounded-md transition-colors";
+              "text-sm font-semibold px-3 py-1 rounded-md transition-colors whitespace-nowrap";
             const activeClasses =
               "text-orange-500 bg-orange-100 hover:bg-orange-200";
             let inactiveClasses =
