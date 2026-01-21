@@ -7,6 +7,7 @@ import authPlugin from "./plugins/auth";
 import { auth } from "./lib/auth";
 import signupRoutes from "./modules/auth/signup.routes";
 import authRoutes from "./modules/auth/auth.routes";
+import relationshipRoutes from "./modules/relationships/relationships.routes";
 
 export const app = fastify({
   logger: true,
@@ -32,6 +33,9 @@ await app.register(signupRoutes, { prefix: "/auth" });
 
 // Better Auth handler
 await app.register(authRoutes)
+
+// Relationships routes
+await app.register(relationshipRoutes, { prefix: "/api/relationships" });
 
 // Error hanlder
 app.setErrorHandler((error: FastifyError, request, reply) => {
