@@ -4,10 +4,9 @@ import { emailOTP } from "better-auth/plugins";
 import { Resend } from "resend";
 import { PrismaClient } from "../generated/prisma/client";
 
-const prisma = new PrismaClient();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export const auth = betterAuth({
+export const auth = (prisma: PrismaClient = new PrismaClient()) => betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),

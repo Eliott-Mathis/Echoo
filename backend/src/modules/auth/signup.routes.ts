@@ -1,6 +1,5 @@
 import { FastifyInstance } from "fastify";
 import { JSONSchemaType } from "ajv";
-import { auth } from "../../lib/auth";
 import { HttpError } from "../../helpers/HttpError";
 import bcrypt from "bcrypt";
 
@@ -102,8 +101,8 @@ export default async function signupRoutes(fastify: FastifyInstance) {
       const { email, code, password, username, displayName, birthDate } = request.body;
 
       await verifySignupOtp(fastify.db, email, code);
-
-      const response = await auth.api.signUpEmail({
+      
+      const response = await fastify.auth.api.signUpEmail({
         body: {
           email,
           password,
