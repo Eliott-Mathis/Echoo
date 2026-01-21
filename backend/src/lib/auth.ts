@@ -3,10 +3,16 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { emailOTP } from "better-auth/plugins";
 import { Resend } from "resend";
 import { PrismaClient } from "../generated/prisma/client";
+import { stripe } from "@better-auth/stripe";
+import Stripe from "stripe";
+
+const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2025-12-15.clover"
+})
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export const auth = (prisma: PrismaClient = new PrismaClient()) => betterAuth({
+const auth = (prisma: PrismaClient = new PrismaClient()) => betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
@@ -85,5 +91,28 @@ export const auth = (prisma: PrismaClient = new PrismaClient()) => betterAuth({
         }
       },
     }),
+    stripe({
+      stripeClient,
+      stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+      createCustomerOnSignUp: true,
+      subscription: {
+        enabled: true,
+        plans: [
+          {
+            name: 'dynamite',
+            priceId: 'price_1SrwJN2N2CmERs9FxNSKh0Zq',
+            limits: {
+              animatedProfilePicture: true,
+              customUsernameFont: true,
+              customUserCard: true,
+              customBanner: true,
+              customStatusIcon: true
+            }
+          }
+        ]
+      }
+    }),
   ],
 });
+
+export default auth;
