@@ -15,13 +15,16 @@ interface SocketMessageType {
 export default fp(async (fastify: FastifyInstance) => {
   const io = new IOServer(fastify.server, {
     cors: {
-      origin: '*', // adapter selon ton front
+      origin: 'http://localhost:5173', // adapter selon ton front
+      credentials: true
     },
   });
 
   io.use(async (socket, next) => {
     try {
-      const token = socket.handshake.auth.token;
+      const token = socket.request.headers["cookie"]
+      console.log("Token, ", token)
+      
       if (!token) return next(new Error('Unauthorized'));
 
       // Vérifie le token avec BetterAuth
@@ -54,20 +57,21 @@ export default fp(async (fastify: FastifyInstance) => {
 
     socket.on('sendFriendRequest', async (data, ack : (res: SocketMessageType) => void) => {
         const fromUserId = (socket as any).userId
-        const { toUserId } = JSON.parse(data);
-
-        // get user socket
-        const userToAddSocket = onlineUsers.get(toUserId);
+        const { toUser } = data;
 
         // find user in db
-        const userToAdd = await fastify.db.user.findUnique({ where: {id: toUserId}})
-
+        const userToAdd = await fastify.db.user.findUnique({ where: {username: toUser}})
+        
         if(!userToAdd) return ack?.({type: 'error', message: 'The user was not found' })
+
+        // get user socket
+        const userToAddSocket = onlineUsers.get(userToAdd.id);
+
 
         // create friend request 
         await fastify.db.relationship.create({ data: {
             ownerId: fromUserId,
-            targetId: toUserId,
+            targetId: userToAdd.id,
             type: 'PENDING'
         }})
 
