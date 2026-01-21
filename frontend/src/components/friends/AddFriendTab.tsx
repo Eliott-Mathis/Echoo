@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 
 export default function AddFriendTab() {
   const [username, setUsername] = useState("")
+  const [error, setError] = useState("")
   const [socket, setSocket] = useState<any>(null);
 
   useEffect(() => {
@@ -13,7 +14,9 @@ export default function AddFriendTab() {
   const handleAddFriend = () => {
     if (!socket) return; 
     socket.emit('sendFriendRequest', { toUser: username }, (res:any) => {
-      console.log(res);
+      if(res.type === 'error'){
+          setError(res.message)
+      }
     });
   };
 
@@ -26,14 +29,15 @@ export default function AddFriendTab() {
         </p>
       </div>
       <div className="inputContainer flex items-center gap-3 w-full">
-        <div className="bg-background-secondary border border-border-primary rounded-lg px-4 py-2 flex items-center gap-1 w-full">
+        <div className={`bg-background-secondary border border-border-primary rounded-lg px-4 py-2 flex items-center gap-1 w-full ${error ? 'bg-danger-lowest border-danger-low' : ''}`}>
           <input
             onChange={(e) => setUsername(e.target.value)}
             value={username}
             type="text"
             placeholder="Username"
-            className="text-sm text-input-primary-default-text placeholder:text-input-primary-default-placeholder outline-none w-full"
+            className={`text-sm text-input-primary-default-text placeholder:text-input-primary-default-placeholder outline-none w-full `}
           />
+          <p className="text-sm whitespace-nowrap italic text-danger-low">{ error }</p>
         </div>
         <button
           onClick={handleAddFriend}
