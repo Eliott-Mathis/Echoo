@@ -143,7 +143,7 @@ export default function FriendsSidebar() {
           />
         ))}
       </div>
-      <UserControlCard name="Matod" username="mathod98" presence="online" />
+      <UserControlCard />
     </aside>
   );
 }
