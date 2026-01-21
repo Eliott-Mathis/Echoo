@@ -1,17 +1,8 @@
 import { Outlet } from "react-router-dom";
-import { authClient } from "@/lib/authClient";
 
 import ServerList from "@/components/ServerList";
 import FriendsSidebar from "@/components/friends/FriendsSidebar";
-import LoadingScreen from "@/components/LoadingScreen";
-
 export default function Home() {
-  const { data, isPending, error } = authClient.useSession();
-
-  if (isPending) return <LoadingScreen />;
-  if (error) return <p>Erreur</p>;
-  if (!data?.user) return <p>Non connecté</p>;
-
   return (
     <div className="min-h-screen flex bg-background-primary text-neutral-highest">
       <aside className="bg-darkblue-400 border-r border-border-primary">
