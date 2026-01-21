@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Rabbit, Search, Users, UsersRound } from "lucide-react";
 import FriendListItem from "@/components/friends/FriendListItem";
 import type { UserStatus } from "@/types/userStatus";
 
@@ -87,6 +87,23 @@ export default function FriendsSidebar() {
         />
       </label>
       <div className="flex flex-col gap-1">
+        <div className="tabs mt-2 mb-4 flex flex-col gap-2">
+            <button className="tab tab-active flex items-center gap-2 text-sm px-3 py-1 rounded-md text-neutral-highest w-full space-around justify-between">
+              <span className="title flex items-center gap-2">
+                <UsersRound size={20} />
+                Friends
+              </span>
+              <span className="bg-danger-low text-danger-highest text-xs font-semibold px-2 py-0.5 rounded-full">
+                5
+              </span>
+            </button>
+            <button className="tab tab-active flex items-center gap-2 text-sm px-3 py-1 rounded-md text-neutral-highest w-full space-around justify-between">
+              <span className="title flex items-center gap-2">
+                <Rabbit size={20} />
+                Dynamite
+              </span>
+            </button>
+        </div>
         <span className="text-xs font-semibold uppercase text-neutral-medium tracking-wider px-2">
           Direct Messages
         </span>
