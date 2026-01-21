@@ -1,6 +1,22 @@
 import { UserPlus2 } from "lucide-react";
+import createSocket from "@/lib/socket";
+import { useState, useEffect } from "react";
 
 export default function AddFriendTab() {
+  const [username, setUsername] = useState("")
+  const [socket, setSocket] = useState<any>(null);
+
+  useEffect(() => {
+    createSocket().then(s => setSocket(s));
+  }, []);
+
+  const handleAddFriend = () => {
+    if (!socket) return; 
+    socket.emit('sendFriendRequest', { toUser: username }, (res:any) => {
+      console.log(res);
+    });
+  };
+
   return (
     <div className="max-w-3xl flex flex-col gap-6">
       <div className="flex flex-col gap-2">
@@ -12,12 +28,15 @@ export default function AddFriendTab() {
       <div className="inputContainer flex items-center gap-3 w-full">
         <div className="bg-background-secondary border border-border-primary rounded-lg px-4 py-2 flex items-center gap-1 w-full">
           <input
+            onChange={(e) => setUsername(e.target.value)}
+            value={username}
             type="text"
             placeholder="Username"
             className="text-sm text-input-primary-default-text placeholder:text-input-primary-default-placeholder outline-none w-full"
           />
         </div>
         <button
+          onClick={handleAddFriend}
           type="button"
           className="flex items-center bg-success-medium text-success-lowest text-sm font-semibold px-4 py-2 rounded-md hover:bg-success-high transition-colors whitespace-nowrap"
         >
