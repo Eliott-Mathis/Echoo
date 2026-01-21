@@ -82,7 +82,7 @@ export default fp(async (fastify: FastifyInstance) => {
         }})
 
         // send notification to second user
-        if(userToAddSocket) userToAddSocket.send({type: 'success', message: 'You received a friend request !'})
+        if(userToAddSocket) userToAddSocket.emit('notification',{type: 'success', message: 'You received a friend request !'})
 
         // return success to sender
         return ack?.({type: 'success', message: "Your request has been sent successfully"})
