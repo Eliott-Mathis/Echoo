@@ -19,7 +19,7 @@ const auth = (prisma: PrismaClient = new PrismaClient()) => betterAuth({
   trustedOrigins: [process.env.CLIENT_ORIGIN ?? "http://localhost:5173"],
   emailAndPassword: {
     enabled: true,
-    autoSignIn: false,
+    autoSignIn: true,
   },
   user: {
     modelName: "User",
