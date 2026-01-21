@@ -28,8 +28,6 @@ export default function UserControlCard({
       }
     | undefined;
 
-  console.log("UserControlCard sessionUser:", sessionUser);
-
   const resolvedName =
     name ?? sessionUser?.name ?? "Unknown";
   const resolvedUsername =
