@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { Rabbit, Search, UsersRound } from "lucide-react";
 import FriendListItem from "@/components/friends/FriendListItem";
 import SidebarNavTab from "@/components/friends/SidebarNavTab";
 import UserControlCard from "@/components/friends/UserControlCard";
+import { getPendingFriendRequestCount } from "@/api/relationships.api";
 import type { UserStatus } from "@/types/userStatus";
 
 const friendItems: Array<{ id: number; name: string; status: UserStatus }> = [
@@ -79,6 +81,26 @@ const friendItems: Array<{ id: number; name: string; status: UserStatus }> = [
 
 export default function FriendsSidebar() {
   const dmPathFor = (name: string) => `/messages/${encodeURIComponent(name)}`;
+  const [pendingCount, setPendingCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadPendingCount = async () => {
+      try {
+        const count = await getPendingFriendRequestCount();
+        if (isMounted) setPendingCount(count);
+      } catch {
+        if (isMounted) setPendingCount(null);
+      }
+    };
+
+    loadPendingCount();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <aside className="w-72 bg-darkblue-400 border-r border-input-primary-default-border flex flex-col gap-4 p-4">
@@ -96,7 +118,11 @@ export default function FriendsSidebar() {
             to="/friends/addfriend"
             label="Friends"
             icon={UsersRound}
-            badgeCount={5}
+            badgeCount={
+              typeof pendingCount === "number" && pendingCount > 0
+                ? pendingCount
+                : undefined
+            }
           />
           <SidebarNavTab
             to="/dynamite"
