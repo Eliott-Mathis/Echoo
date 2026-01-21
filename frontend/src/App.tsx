@@ -9,6 +9,7 @@ import Home from "./views/Home";
 import FriendsTab from "./views/home/FriendsTab";
 import DirectMessageTab from "./views/home/DirectMessageTab";
 import DynamiteTab from "./views/home/DynamiteTab";
+import SettingsPopup from "./views/home/SettingsPopup";
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/messages" element={<DirectMessageTab />} />
           <Route path="/messages/:username" element={<DirectMessageTab />} />
           <Route path="/dynamite" element={<DynamiteTab />} />
+          <Route path="/settings" element={<SettingsPopup />} />
         </Route>
         <Route path="/signup" element={<SignUp />} />
         <Route path="/email-verification" element={<EmailVerification />} />
