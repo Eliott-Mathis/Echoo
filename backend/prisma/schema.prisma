@@ -27,8 +27,7 @@ enum UserStatus {
 }
 
 enum RelationshipType {
-  PENDING_OUTGOING // Tu as envoyé la demande
-  PENDING_INCOMING // Tu as reçu la demande
+  PENDING // Demande en attente
   FRIENDS // Amis mutuels
   BLOCKED
 }
@@ -195,8 +194,8 @@ model UserSettings {
 // - Blocage simple: si type = BLOCKED, l'autre ne peut plus interagir
 //
 // Exemple: Alice envoie une demande à Bob
-// → Row 1: ownerId=Alice, targetId=Bob, type=PENDING_OUTGOING
-// → Row 2: ownerId=Bob, targetId=Alice, type=PENDING_INCOMING
+// → Row 1: ownerId=Alice, targetId=Bob, type=PENDING
+// → Row 2: ownerId=Bob, targetId=Alice, type=PENDING
 //
 // Bob accepte:
 // → Les deux rows passent à type=FRIENDS
