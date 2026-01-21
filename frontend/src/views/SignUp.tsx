@@ -11,7 +11,7 @@ import Input from "@/components/Input";
 import Button from "@/components/Button";
 
 // Utils
-import { useInput } from "@/utils/useInput";
+import { useInput } from "@/hooks/useInput";
 import { useSendVerificationOtp, useCheckEmail } from "@/hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";

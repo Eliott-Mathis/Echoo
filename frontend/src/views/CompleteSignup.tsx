@@ -9,7 +9,7 @@ import Input from "@/components/Input";
 import Button from "@/components/Button";
 
 // Utils
-import { useInput } from "@/utils/useInput";
+import { useInput } from "@/hooks/useInput";
 import { useCompleteSignUp } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
