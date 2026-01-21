@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { emailOTP } from "better-auth/plugins";
+import { customSession, emailOTP } from "better-auth/plugins";
 import { Resend } from "resend";
 import { PrismaClient } from "../generated/prisma/client";
 import { stripe } from "@better-auth/stripe";
@@ -11,6 +11,21 @@ const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 })
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+const mapStatusToPresence = (status?: string | null) => {
+  switch (status) {
+    case "ONLINE":
+      return "online";
+    case "IDLE":
+      return "away";
+    case "DO_NOT_DISTURB":
+      return "dnd";
+    case "OFFLINE":
+    case "INVISIBLE":
+    default:
+      return "offline";
+  }
+};
 
 const auth = (prisma: PrismaClient = new PrismaClient()) => betterAuth({
   database: prismaAdapter(prisma, {
@@ -34,6 +49,8 @@ const auth = (prisma: PrismaClient = new PrismaClient()) => betterAuth({
     additionalFields: {
       username: { type: "string", required: true },
       birthDate: { type: "date", required: true },
+      status: { type: "string", required: false },
+      customStatus: { type: "string", required: false },
     },
   },
   account: {
@@ -46,6 +63,16 @@ const auth = (prisma: PrismaClient = new PrismaClient()) => betterAuth({
     modelName: "Verification",
   },
   plugins: [
+    customSession(async ({ user, session }) => {
+      return {
+        user: {
+          ...user,
+          avatarUrl: user.image,
+          presence: mapStatusToPresence((user as { status?: string | null }).status),
+        },
+        session,
+      };
+    }),
     emailOTP({
       overrideDefaultEmailVerification: true,
       sendVerificationOTP: async ({
