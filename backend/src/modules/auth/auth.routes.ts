@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import "dotenv/config";
+import { fastifyToFetchRequest } from "../../helpers/http";
 
 export const authRoutes = async (fastify: FastifyInstance) => {
   fastify.route({
@@ -7,20 +8,7 @@ export const authRoutes = async (fastify: FastifyInstance) => {
     url: "/api/auth/*",
     async handler(request, reply) {
       try {
-        // Construct request URL
-        const url = new URL(request.url, `http://${request.headers.host}`);
-
-        // Convert Fastify headers to standard Headers object
-        const headers = new Headers();
-        Object.entries(request.headers).forEach(([key, value]) => {
-          if (value) headers.append(key, value.toString());
-        });
-        // Create Fetch API-compatible request
-        const req = new Request(url.toString(), {
-          method: request.method,
-          headers,
-          ...(request.body ? { body: JSON.stringify(request.body) } : {}),
-        });
+        const req = fastifyToFetchRequest(request);
         // Process authentication request
         const response = await fastify.auth.handler(req);
         // Forward response to client
