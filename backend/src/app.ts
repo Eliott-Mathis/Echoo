@@ -4,7 +4,7 @@ import formbody from "@fastify/formbody";
 import cookie from "@fastify/cookie";
 import prismaPlugin from "./plugins/prisma";
 import authPlugin from "./plugins/auth";
-import { auth } from "./lib/auth";
+import socketPlugin from "./plugins/socket";
 import signupRoutes from "./modules/auth/signup.routes";
 import authRoutes from "./modules/auth/auth.routes";
 import relationshipRoutes from "./modules/relationships/relationships.routes";
@@ -23,6 +23,8 @@ await app.register(formbody);
 
 await app.register(prismaPlugin);
 await app.register(authPlugin)
+await app.register(socketPlugin)
+
 app.register(cookie, {
   secret: process.env.COOKIE_SECRET,
   parseOptions: {},
