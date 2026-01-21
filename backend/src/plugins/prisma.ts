@@ -2,6 +2,11 @@ import fp from "fastify-plugin";
 import { PrismaClient } from "../generated/prisma/client";
 import fastify, { FastifyInstance } from "fastify";
 
+declare module "fastify" {
+  interface FastifyInstance {
+    db: PrismaClient;
+  }
+}
 
 
 export default fp(async (fastify: FastifyInstance) => {
