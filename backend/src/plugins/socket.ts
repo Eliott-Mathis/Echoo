@@ -1,6 +1,7 @@
 import fp from 'fastify-plugin';
 import { Server as IOServer } from 'socket.io';
 import { FastifyInstance } from 'fastify';
+import { fastifyHeadersToFetchHeaders } from '../helpers/http';
 
 export default fp(async (fastify: FastifyInstance) => {
   const io = new IOServer(fastify.server, {
@@ -15,16 +16,21 @@ export default fp(async (fastify: FastifyInstance) => {
       if (!token) return next(new Error('Unauthorized'));
 
       // Vérifie le token avec BetterAuth
-      const user = await fastify.auth.api.getSession(token)
-      console.log(user)
-      if (!user) return next(new Error('Unauthorized'));
+      const headers = fastifyHeadersToFetchHeaders(
+        socket.handshake.headers as any,
+      );
+
+      headers.set('authorization', `Bearer ${token}`);
+
+      const session = await fastify.auth.api.getSession({ headers });
+      if (!session?.user) return next(new Error('Unauthorized'));
 
       // Stocke l’utilisateur dans le socket pour l’utiliser plus tard
-      (socket as any).user = user;
+      (socket as any).user = session.user;
       next();
     } catch (err) {
-        console.log(err)
-      //next(err);
+      console.log(err);
+      next(err as Error);
     }
   });
 
