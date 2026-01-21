@@ -3,11 +3,12 @@ import { authClient } from "@/lib/authClient";
 
 import ServerList from "@/components/ServerList";
 import FriendsSidebar from "@/components/friends/FriendsSidebar";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function Home() {
   const { data, isPending, error } = authClient.useSession();
 
-  if (isPending) return <p>Loading...</p>;
+  if (isPending) return <LoadingScreen />;
   if (error) return <p>Erreur</p>;
   if (!data?.user) return <p>Non connecté</p>;
 
