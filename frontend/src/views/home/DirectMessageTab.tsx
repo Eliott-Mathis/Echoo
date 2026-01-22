@@ -37,7 +37,7 @@ export default function DirectMessageTab() {
           isSelf: true,
         },
         {
-          id: "intro",
+          id: "intro-2",
           author: "You",
           avatarUrl: `https://ui-avatars.com/api/?name=You&background=random&size=128`,
           content: "c'est quoi l'IP",
