@@ -1,19 +1,15 @@
-import DirectMessageItem from "./DirectMessageItem";
-import type { DirectMessage } from "../../types/messages";
+import DirectMessageItem from './DirectMessageItem';
+import type { DirectMessage } from '../../types/messages';
 
-export default function DirectMessageList({
-  messages,
-}: {
-  messages: DirectMessage[];
-}) {
+export default function DirectMessageList({ messages }: { messages: DirectMessage[] }) {
   const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
   const getMessageTime = (message: DirectMessage) => {
-    if (typeof message.createdAt === "number") {
+    if (typeof message.createdAt === 'number') {
       return message.createdAt;
     }
 
-    if (typeof message.createdAt === "string") {
+    if (typeof message.createdAt === 'string') {
       const parsed = Date.parse(message.createdAt);
       return Number.isNaN(parsed) ? null : parsed;
     }
@@ -21,10 +17,7 @@ export default function DirectMessageList({
     return null;
   };
 
-  const shouldGroupWithPrevious = (
-    previous: DirectMessage | null,
-    current: DirectMessage,
-  ) => {
+  const shouldGroupWithPrevious = (previous: DirectMessage | null, current: DirectMessage) => {
     if (!previous) {
       return false;
     }
@@ -43,9 +36,7 @@ export default function DirectMessageList({
     return Math.abs(currentTime - previousTime) <= FIVE_MINUTES_MS;
   };
 
-  const groupedMessages = messages.reduce<
-    Array<{ id: string; messages: DirectMessage[] }>
-  >((groups, message) => {
+  const groupedMessages = messages.reduce<Array<{ id: string; messages: DirectMessage[] }>>((groups, message) => {
     const lastGroup = groups.at(-1) ?? null;
     const lastMessage = lastGroup?.messages.at(-1) ?? null;
 
@@ -60,15 +51,11 @@ export default function DirectMessageList({
 
   return (
     <div className="flex-1 min-h-0">
-      <div className="flex flex-col gap-4 overflow-y-auto h-full flex-start-end justify-end">
+      <div className="flex flex-col gap-4 overflow-y-hidden h-full flex-start-end justify-end">
         {groupedMessages.map((group) => (
           <div key={group.id} className="flex flex-col w-full">
             {group.messages.map((message, index) => (
-              <DirectMessageItem
-                key={message.id}
-                message={message}
-                showMeta={index === 0}
-              />
+              <DirectMessageItem key={message.id} message={message} showMeta={index === 0} />
             ))}
           </div>
         ))}
