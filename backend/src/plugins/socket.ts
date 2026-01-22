@@ -2,6 +2,7 @@ import fp from 'fastify-plugin';
 import { Server as IOServer, Socket } from 'socket.io';
 import { FastifyInstance } from 'fastify';
 import { fastifyHeadersToFetchHeaders } from '../helpers/http';
+import { RelationshipType } from '../generated/prisma/client';
 
 const onlineUsers = new Map<string, Set<Socket>>();
 const messageRateLimits = new Map<string, { lastSentAt: number }>();
@@ -83,6 +84,7 @@ export default fp(async (fastify: FastifyInstance) => {
   };
 
   const getDmKey = (firstId: string, secondId: string) => [firstId, secondId].sort().join(':');
+  const userRoom = (userId: string) => `user:${userId}`;
 
   const io = new IOServer(fastify.server, {
     cors: {
@@ -105,6 +107,7 @@ export default fp(async (fastify: FastifyInstance) => {
 
       socket.data.userId = session.user.id;
       const isFirstConnection = addUserSocket(session.user.id, socket);
+      socket.join(userRoom(session.user.id));
       if (isFirstConnection) {
         await updateUserPresence(session.user.id, 'ONLINE');
       }
@@ -301,33 +304,76 @@ export default fp(async (fastify: FastifyInstance) => {
           return ack?.({ type: 'error', message: 'You cannot add yourself.' });
         }
 
-        const existing = await fastify.db.relationship.findFirst({
-          where: {
-            OR: [
-              { ownerId: fromUserId, targetId: userToAdd.id },
-              { ownerId: userToAdd.id, targetId: fromUserId },
-            ],
-          },
-          select: { id: true },
-        });
-
-        if (existing) return ack?.({ type: 'error', message: 'A request already exists.' });
-
-        await fastify.db.relationship.create({
-          data: {
-            ownerId: fromUserId,
-            targetId: userToAdd.id,
-            type: 'PENDING',
-          },
-        });
-
-        const userToAddSockets = onlineUsers.get(userToAdd.id);
-
-        if (userToAddSockets) {
-          userToAddSockets.forEach((userSocket) => {
-            userSocket.emit('notification', { type: 'success', message: 'You received a friend request !' });
+        const result = await fastify.db.$transaction(async (tx) => {
+          const outgoing = await tx.relationship.findUnique({
+            where: { ownerId_targetId: { ownerId: fromUserId, targetId: userToAdd.id } },
           });
+
+          const incoming = await tx.relationship.findUnique({
+            where: { ownerId_targetId: { ownerId: userToAdd.id, targetId: fromUserId } },
+          });
+
+          if (outgoing?.type === RelationshipType.BLOCKED || incoming?.type === RelationshipType.BLOCKED) {
+            return { status: 'blocked' as const };
+          }
+
+          if (outgoing?.type === RelationshipType.FRIENDS || incoming?.type === RelationshipType.FRIENDS) {
+            return { status: 'already-friends' as const };
+          }
+
+          if (outgoing?.type === RelationshipType.PENDING) {
+            return { status: 'already-pending' as const };
+          }
+
+          if (incoming?.type === RelationshipType.PENDING) {
+            await tx.relationship.upsert({
+              where: { ownerId_targetId: { ownerId: userToAdd.id, targetId: fromUserId } },
+              update: { type: RelationshipType.FRIENDS },
+              create: { ownerId: userToAdd.id, targetId: fromUserId, type: RelationshipType.FRIENDS },
+            });
+
+            await tx.relationship.upsert({
+              where: { ownerId_targetId: { ownerId: fromUserId, targetId: userToAdd.id } },
+              update: { type: RelationshipType.FRIENDS },
+              create: { ownerId: fromUserId, targetId: userToAdd.id, type: RelationshipType.FRIENDS },
+            });
+
+            return { status: 'accepted' as const };
+          }
+
+          await tx.relationship.create({
+            data: {
+              ownerId: fromUserId,
+              targetId: userToAdd.id,
+              type: RelationshipType.PENDING,
+            },
+          });
+
+          return { status: 'pending' as const };
+        });
+
+        if (result.status === 'blocked') {
+          return ack?.({ type: 'error', message: 'Unable to send request.' });
         }
+
+        if (result.status === 'already-friends') {
+          return ack?.({ type: 'error', message: 'You are already friends.' });
+        }
+
+        if (result.status === 'already-pending') {
+          return ack?.({ type: 'error', message: 'A request has already been sent.' });
+        }
+
+        if (result.status === 'accepted') {
+          io.to(userRoom(fromUserId)).emit('friend:list-updated');
+          io.to(userRoom(userToAdd.id)).emit('friend:list-updated');
+          io.to(userRoom(fromUserId)).emit('friend:pending-updated');
+          io.to(userRoom(userToAdd.id)).emit('friend:pending-updated');
+
+          return ack?.({ type: 'success', message: `You are now friends with ${toUser}.` });
+        }
+
+        io.to(userRoom(userToAdd.id)).emit('friend:pending-updated');
 
         return ack?.({ type: 'success', message: 'Your request has been sent successfully' });
       } catch (error) {
