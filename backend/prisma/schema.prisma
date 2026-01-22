@@ -233,6 +233,7 @@ model Relationship {
 model Conversation {
   id            String           @id @default(cuid())
   type          ConversationType @default(DM)
+  dmKey         String?          @unique // DM unique key: sorted user ids ("a:b")
   name          String?          @db.VarChar(100) // Null pour DM 1-1, optionnel pour groupes
   iconUrl       String? // Icône personnalisée du groupe
   ownerId       String? // Créateur du groupe (null pour DM 1-1)
