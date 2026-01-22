@@ -1,10 +1,22 @@
-import { io } from "socket.io-client"
+import { io, Socket } from "socket.io-client"
+import { NotificationAPI } from "./notification"
 
-async function createSocket() {
-  //const token = await getAccessToken();
-  return io('http://localhost:3000', {
-    withCredentials:true,
-  });
+export interface SocketNotification {
+  type: "success" | "error"
+  message: string
 }
 
-export default createSocket;
+const socket: Socket = io("http://localhost:3000", {
+  withCredentials: true,
+})
+
+socket.on('notification', (data: SocketNotification) => {
+  NotificationAPI.emit(data.message)
+
+  setTimeout(() => {
+    NotificationAPI.clear()
+  }, 3000)
+})
+
+
+export default socket;

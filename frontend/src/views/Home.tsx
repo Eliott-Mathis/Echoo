@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom";
+import Notification from "@/components/Notification";
 
 import ServerList from "@/components/ServerList";
 import FriendsSidebar from "@/components/friends/FriendsSidebar";
@@ -14,6 +15,7 @@ export default function Home() {
           <Outlet />
         </main>
       </div>
+      <Notification/>
     </div>
   );
 }
