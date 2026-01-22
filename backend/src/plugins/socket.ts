@@ -4,6 +4,11 @@ import { FastifyInstance } from 'fastify';
 import { fastifyHeadersToFetchHeaders } from '../helpers/http';
 
 const onlineUsers = new Map<string, Set<Socket>>();
+const messageRateLimits = new Map<string, { lastSentAt: number }>();
+
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173';
+const MAX_MESSAGE_LENGTH = 4000;
+const MIN_MESSAGE_INTERVAL_MS = 250;
 
 type MessageType = 'error' | 'success';
 
@@ -60,49 +65,41 @@ const mapMessagePayload = (message: any): DmMessagePayload => ({
 export default fp(async (fastify: FastifyInstance) => {
   const io = new IOServer(fastify.server, {
     cors: {
-      origin: 'http://localhost:5173', // adapter selon ton front
+      origin: CLIENT_ORIGIN,
       credentials: true,
     },
   });
 
   io.use(async (socket, next) => {
     try {
-      const token = socket.request.headers['cookie'];
-      console.log('Token, ', token);
-
-      if (!token) return next(new Error('Unauthorized'));
-
-      // Vérifie le token avec BetterAuth
       const headers = fastifyHeadersToFetchHeaders(socket.handshake.headers as any);
+      const authToken = typeof socket.handshake.auth?.token === 'string' ? socket.handshake.auth.token : undefined;
 
-      headers.set('authorization', `Bearer ${token}`);
+      if (authToken && !headers.has('authorization')) {
+        headers.set('authorization', `Bearer ${authToken}`);
+      }
 
       const session = await fastify.auth.api.getSession({ headers });
       if (!session?.user) return next(new Error('Unauthorized'));
 
-      (socket as any).userId = session.user.id;
+      socket.data.userId = session.user.id;
       addUserSocket(session.user.id, socket);
       next();
     } catch (err) {
-      console.log(err);
+      fastify.log.error(err);
       next(err as Error);
     }
   });
 
   io.on('connection', (socket) => {
-    console.log('Utilisateur connecté:', (socket as any).userId);
-
-    socket.on('message', (msg) => {
-      console.log(`Message de ${(socket as any).userId}: ${msg}`);
-      socket.emit('message', `Reçu: ${msg}`);
-    });
+    fastify.log.info({ userId: socket.data.userId }, 'Socket connected');
 
     socket.on('dm:open', async (data: { username?: string }, ack: SocketAck<{ conversationId: string; recipient: { id: string; username: string; displayName: string; avatarUrl: string | null }; messages: DmMessagePayload[] }>) => {
       try {
-        const fromUserId = (socket as any).userId as string;
+        const fromUserId = socket.data.userId as string;
         const username = data?.username?.trim();
 
-        if (!username) {
+        if (!username || username.length > 32) {
           return ack?.({ type: 'error', message: 'Username is required.' });
         }
 
@@ -119,21 +116,23 @@ export default fp(async (fastify: FastifyInstance) => {
           return ack?.({ type: 'error', message: 'Cannot open a DM with yourself.' });
         }
 
-        let conversation = await fastify.db.conversation.findFirst({
-          where: {
-            type: 'DM',
-            members: {
-              some: { userId: fromUserId, leftAt: null },
+        const conversation = await fastify.db.$transaction(async (tx) => {
+          const existing = await tx.conversation.findFirst({
+            where: {
+              type: 'DM',
+              members: {
+                some: { userId: fromUserId, leftAt: null },
+              },
+              AND: {
+                members: { some: { userId: recipient.id, leftAt: null } },
+              },
             },
-            AND: {
-              members: { some: { userId: recipient.id, leftAt: null } },
-            },
-          },
-          select: { id: true },
-        });
+            select: { id: true },
+          });
 
-        if (!conversation) {
-          conversation = await fastify.db.conversation.create({
+          if (existing) return existing;
+
+          return tx.conversation.create({
             data: {
               type: 'DM',
               members: {
@@ -142,7 +141,7 @@ export default fp(async (fastify: FastifyInstance) => {
             },
             select: { id: true },
           });
-        }
+        });
 
         socket.join(conversation.id);
 
@@ -175,13 +174,24 @@ export default fp(async (fastify: FastifyInstance) => {
 
     socket.on('dm:send', async (data: { conversationId?: string; content?: string }, ack: SocketAck<{ message: DmMessagePayload }>) => {
       try {
-        const fromUserId = (socket as any).userId as string;
+        const fromUserId = socket.data.userId as string;
         const conversationId = data?.conversationId;
         const content = data?.content?.trim();
 
         if (!conversationId || !content) {
           return ack?.({ type: 'error', message: 'Message content is required.' });
         }
+
+        if (content.length > MAX_MESSAGE_LENGTH) {
+          return ack?.({ type: 'error', message: `Message is too long (max ${MAX_MESSAGE_LENGTH} characters).` });
+        }
+
+        const rateLimit = messageRateLimits.get(socket.id);
+        const now = Date.now();
+        if (rateLimit && now - rateLimit.lastSentAt < MIN_MESSAGE_INTERVAL_MS) {
+          return ack?.({ type: 'error', message: 'You are sending messages too quickly.' });
+        }
+        messageRateLimits.set(socket.id, { lastSentAt: now });
 
         const membership = await fastify.db.conversationMember.findFirst({
           where: { conversationId, userId: fromUserId, leftAt: null },
@@ -217,56 +227,71 @@ export default fp(async (fastify: FastifyInstance) => {
 
         return ack?.({ type: 'success', data: { message: payload } });
       } catch (error) {
-        console.log(error);
+        fastify.log.error(error);
         return ack?.({ type: 'error', message: 'Failed to send message.' });
       }
     });
 
     socket.on('sendFriendRequest', async (data, ack: (res: SocketMessageType) => void) => {
-      const fromUserId = (socket as any).userId;
-      const { toUser } = data;
+      try {
+        const fromUserId = socket.data.userId as string;
+        const toUser = typeof data?.toUser === 'string' ? data.toUser.trim() : '';
 
-      // find user in db
-      const userToAdd = await fastify.db.user.findUnique({ where: { username: toUser } });
+        if (!toUser || toUser.length > 32) {
+          return ack?.({ type: 'error', message: 'Username is required.' });
+        }
 
-      if (!userToAdd) return ack?.({ type: 'error', message: 'The user was not found' });
-
-      // get user socket
-      const userToAddSockets = onlineUsers.get(userToAdd.id);
-
-      // this relationship already exists ?
-      const relationship = await fastify.db.relationship.findFirst({
-        where: {
-          ownerId: fromUserId || userToAdd.id,
-        },
-      });
-
-      if (relationship) return ack?.({ type: 'error', message: 'A request has already been sent' });
-
-      // create friend request
-      await fastify.db.relationship.create({
-        data: {
-          ownerId: fromUserId,
-          targetId: userToAdd.id,
-          type: 'PENDING',
-        },
-      });
-
-      // send notification to second user
-      if (userToAddSockets) {
-        userToAddSockets.forEach((userSocket) => {
-          userSocket.emit('notification', { type: 'success', message: 'You received a friend request !' });
+        const userToAdd = await fastify.db.user.findUnique({
+          where: { username: toUser },
+          select: { id: true },
         });
-      }
 
-      // return success to sender
-      return ack?.({ type: 'success', message: 'Your request has been sent successfully' });
+        if (!userToAdd) return ack?.({ type: 'error', message: 'The user was not found' });
+
+        if (userToAdd.id === fromUserId) {
+          return ack?.({ type: 'error', message: 'You cannot add yourself.' });
+        }
+
+        const existing = await fastify.db.relationship.findFirst({
+          where: {
+            OR: [
+              { ownerId: fromUserId, targetId: userToAdd.id },
+              { ownerId: userToAdd.id, targetId: fromUserId },
+            ],
+          },
+          select: { id: true },
+        });
+
+        if (existing) return ack?.({ type: 'error', message: 'A request already exists.' });
+
+        await fastify.db.relationship.create({
+          data: {
+            ownerId: fromUserId,
+            targetId: userToAdd.id,
+            type: 'PENDING',
+          },
+        });
+
+        const userToAddSockets = onlineUsers.get(userToAdd.id);
+
+        if (userToAddSockets) {
+          userToAddSockets.forEach((userSocket) => {
+            userSocket.emit('notification', { type: 'success', message: 'You received a friend request !' });
+          });
+        }
+
+        return ack?.({ type: 'success', message: 'Your request has been sent successfully' });
+      } catch (error) {
+        fastify.log.error(error);
+        return ack?.({ type: 'error', message: 'Failed to send friend request.' });
+      }
     });
     socket.on('disconnect', () => {
-      const userId = (socket as any).userId as string | undefined;
+      const userId = socket.data.userId as string | undefined;
       if (userId) {
         removeUserSocket(userId, socket);
       }
+      messageRateLimits.delete(socket.id);
     });
   });
 
