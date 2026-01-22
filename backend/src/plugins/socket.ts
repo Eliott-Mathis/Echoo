@@ -67,6 +67,12 @@ export default fp(async (fastify: FastifyInstance) => {
         // get user socket
         const userToAddSocket = onlineUsers.get(userToAdd.id);
 
+        // this relationship already exists ?
+        const relationship = await fastify.db.relationship.findFirst({ where: {
+          ownerId: fromUserId || userToAdd.id
+        }})
+
+        if(relationship) return ack?.({type: 'error', message: 'A request has already been sent' })
 
         // create friend request 
         await fastify.db.relationship.create({ data: {
@@ -76,7 +82,7 @@ export default fp(async (fastify: FastifyInstance) => {
         }})
 
         // send notification to second user
-        if(userToAddSocket) userToAddSocket.send({type: 'success', message: 'You received a friend request !'})
+        if(userToAddSocket) userToAddSocket.emit('notification',{type: 'success', message: 'You received a friend request !'})
 
         // return success to sender
         return ack?.({type: 'success', message: "Your request has been sent successfully"})
