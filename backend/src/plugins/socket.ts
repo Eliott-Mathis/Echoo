@@ -36,17 +36,22 @@ const addUserSocket = (userId: string, socket: Socket) => {
   const existing = onlineUsers.get(userId);
   if (existing) {
     existing.add(socket);
-    return;
+    return false;
   }
 
   onlineUsers.set(userId, new Set([socket]));
+  return true;
 };
 
 const removeUserSocket = (userId: string, socket: Socket) => {
   const existing = onlineUsers.get(userId);
-  if (!existing) return;
+  if (!existing) return false;
   existing.delete(socket);
-  if (existing.size === 0) onlineUsers.delete(userId);
+  if (existing.size === 0) {
+    onlineUsers.delete(userId);
+    return true;
+  }
+  return false;
 };
 
 const mapMessagePayload = (message: any): DmMessagePayload => ({
@@ -63,6 +68,22 @@ const mapMessagePayload = (message: any): DmMessagePayload => ({
 });
 
 export default fp(async (fastify: FastifyInstance) => {
+  const updateUserPresence = async (userId: string, status: 'ONLINE' | 'OFFLINE') => {
+    try {
+      await fastify.db.user.update({
+        where: { id: userId },
+        data: {
+          status,
+          ...(status === 'OFFLINE' ? { lastOnlineAt: new Date() } : {}),
+        },
+      });
+    } catch (error) {
+      fastify.log.error(error);
+    }
+  };
+
+  const getDmKey = (firstId: string, secondId: string) => [firstId, secondId].sort().join(':');
+
   const io = new IOServer(fastify.server, {
     cors: {
       origin: CLIENT_ORIGIN,
@@ -83,7 +104,10 @@ export default fp(async (fastify: FastifyInstance) => {
       if (!session?.user) return next(new Error('Unauthorized'));
 
       socket.data.userId = session.user.id;
-      addUserSocket(session.user.id, socket);
+      const isFirstConnection = addUserSocket(session.user.id, socket);
+      if (isFirstConnection) {
+        await updateUserPresence(session.user.id, 'ONLINE');
+      }
       next();
     } catch (err) {
       fastify.log.error(err);
@@ -116,31 +140,56 @@ export default fp(async (fastify: FastifyInstance) => {
           return ack?.({ type: 'error', message: 'Cannot open a DM with yourself.' });
         }
 
+        const dmKey = getDmKey(fromUserId, recipient.id);
+
         const conversation = await fastify.db.$transaction(async (tx) => {
-          const existing = await tx.conversation.findFirst({
-            where: {
-              type: 'DM',
-              members: {
-                some: { userId: fromUserId, leftAt: null },
-              },
-              AND: {
-                members: { some: { userId: recipient.id, leftAt: null } },
-              },
-            },
-            select: { id: true },
+          let existing = await tx.conversation.findFirst({
+            where: { type: 'DM', dmKey },
+            select: { id: true, dmKey: true },
           });
 
-          if (existing) return existing;
-
-          return tx.conversation.create({
-            data: {
-              type: 'DM',
-              members: {
-                create: [{ userId: fromUserId }, { userId: recipient.id }],
+          if (!existing) {
+            existing = await tx.conversation.findFirst({
+              where: {
+                type: 'DM',
+                members: {
+                  some: { userId: fromUserId },
+                },
+                AND: {
+                  members: { some: { userId: recipient.id } },
+                },
               },
-            },
-            select: { id: true },
+              select: { id: true, dmKey: true },
+            });
+
+            if (existing && !existing.dmKey) {
+              await tx.conversation.update({
+                where: { id: existing.id },
+                data: { dmKey },
+              });
+            }
+          }
+
+          if (!existing) {
+            existing = await tx.conversation.create({
+              data: {
+                type: 'DM',
+                dmKey,
+                members: {
+                  create: [{ userId: fromUserId }, { userId: recipient.id }],
+                },
+              },
+              select: { id: true, dmKey: true },
+            });
+          }
+
+          await tx.conversationMember.upsert({
+            where: { conversationId_userId: { conversationId: existing.id, userId: fromUserId } },
+            update: { leftAt: null, isHidden: false },
+            create: { conversationId: existing.id, userId: fromUserId },
           });
+
+          return existing;
         });
 
         socket.join(conversation.id);
@@ -289,9 +338,44 @@ export default fp(async (fastify: FastifyInstance) => {
     socket.on('disconnect', () => {
       const userId = socket.data.userId as string | undefined;
       if (userId) {
-        removeUserSocket(userId, socket);
+        const shouldMarkOffline = removeUserSocket(userId, socket);
+        if (shouldMarkOffline) {
+          updateUserPresence(userId, 'OFFLINE');
+        }
       }
       messageRateLimits.delete(socket.id);
+    });
+
+    socket.on('dm:leave', async (data: { conversationId?: string }, ack: SocketAck<null>) => {
+      try {
+        const userId = socket.data.userId as string;
+        const conversationId = data?.conversationId;
+
+        if (!conversationId) {
+          return ack?.({ type: 'error', message: 'Conversation id is required.' });
+        }
+
+        const membership = await fastify.db.conversationMember.findFirst({
+          where: { conversationId, userId, leftAt: null },
+          select: { id: true },
+        });
+
+        if (!membership) {
+          return ack?.({ type: 'error', message: 'Not a member of this conversation.' });
+        }
+
+        await fastify.db.conversationMember.update({
+          where: { id: membership.id },
+          data: { leftAt: new Date(), isHidden: true },
+        });
+
+        socket.leave(conversationId);
+
+        return ack?.({ type: 'success' });
+      } catch (error) {
+        fastify.log.error(error);
+        return ack?.({ type: 'error', message: 'Failed to leave conversation.' });
+      }
     });
   });
 
