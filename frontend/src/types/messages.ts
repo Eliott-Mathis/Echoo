@@ -4,5 +4,6 @@ export type DirectMessage = {
   avatarUrl: string;
   content: string;
   timestamp: string;
+  createdAt?: string | number;
   isSelf?: boolean;
 };

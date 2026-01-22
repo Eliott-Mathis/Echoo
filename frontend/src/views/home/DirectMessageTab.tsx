@@ -16,6 +16,8 @@ export default function DirectMessageTab() {
   const { username } = useParams<DirectMessageRouteParams>();
   const {  } = useCallStore();
 
+  const baseTime = Date.now();
+
   const icons = {
     gift: Gift,
     image: ImagePlay,
@@ -31,6 +33,7 @@ export default function DirectMessageTab() {
           avatarUrl: `https://ui-avatars.com/api/?name=${username}&background=random&size=128`,
           content: `salut mec tu veux minecraft?`,
           timestamp: "Just now",
+          createdAt: baseTime - 2 * 60 * 1000,
         },
         {
           id: "intro",
@@ -38,6 +41,7 @@ export default function DirectMessageTab() {
           avatarUrl: `https://ui-avatars.com/api/?name=You&background=random&size=128`,
           content: "oui vas-y",
           timestamp: "Just now",
+          createdAt: baseTime - 60 * 1000,
           isSelf: true,
         },
         {
@@ -46,6 +50,7 @@ export default function DirectMessageTab() {
           avatarUrl: `https://ui-avatars.com/api/?name=You&background=random&size=128`,
           content: "c'est quoi l'IP",
           timestamp: "Just now",
+          createdAt: baseTime - 30 * 1000,
           isSelf: true,
         },
       ]

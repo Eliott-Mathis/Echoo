@@ -11,6 +11,7 @@ import DirectMessageTab from "./views/home/DirectMessageTab";
 import DynamiteTab from "./views/home/DynamiteTab";
 import SettingsPopup from "./views/home/SettingsPopup";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import PublicRoute from "./routes/PublicRoute";
 
 
 function App() {
@@ -29,10 +30,12 @@ function App() {
             <Route path="/settings" element={<SettingsPopup />} />
           </Route>
         </Route>
-        <Route path="/signup" element={<SignUp />} />
+        <Route element={<PublicRoute />}>
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
         <Route path="/email-verification" element={<EmailVerification />} />
         <Route path="/complete-signup" element={<CompleteSignup />} />
-        <Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>
   );
