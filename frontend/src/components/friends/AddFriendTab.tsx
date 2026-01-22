@@ -1,19 +1,16 @@
 import { UserPlus2 } from "lucide-react";
-import createSocket from "@/lib/socket";
+import socket from "@/lib/socket";
 import { useState, useEffect } from "react";
 
 export default function AddFriendTab() {
   const [username, setUsername] = useState("")
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
-  const [socket, setSocket] = useState<any>(null);
-
-  useEffect(() => {
-    createSocket().then(s => setSocket(s));
-  }, []);
 
   const handleAddFriend = () => {
-    if (!socket) return; 
+    setError("")
+    setSuccess("")
+    
     socket.emit('sendFriendRequest', { toUser: username }, (res:any) => {
       if(res.type === 'error'){
           setError(res.message)
