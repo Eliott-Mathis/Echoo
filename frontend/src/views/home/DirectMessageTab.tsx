@@ -8,6 +8,7 @@ import type { DirectMessage } from '../../types/messages';
 import socket, { type DirectMessagePayload, type DmOpenResponse } from '../../lib/socket';
 import { NotificationAPI } from '../../lib/notification';
 import { authClient } from '../../lib/authClient';
+import CallBanner from '@/components/messages/CallBanner';
 
 type DirectMessageRouteParams = {
   username?: string;
@@ -113,6 +114,7 @@ export default function DirectMessageTab() {
       {username ? (
         <div className="w-full flex flex-col gap-6 h-full min-h-0">
           <DirectMessageHeader username={username} />
+          <CallBanner username={username} />
           {isLoading ? <div className="text-sm text-neutral-medium">Loading messages...</div> : <DirectMessageList messages={messages} />}
           <DirectMessageComposer username={username} icons={icons} onSend={handleSendMessage} isSending={isSending} />
         </div>
