@@ -1,80 +1,80 @@
-import { useEffect, useState } from "react";
-import { Rabbit, Search, UsersRound } from "lucide-react";
-import FriendListItem from "@/components/friends/FriendListItem";
-import SidebarNavTab from "@/components/friends/SidebarNavTab";
-import UserControlCard from "@/components/friends/UserControlCard";
-import { getPendingFriendRequestCount } from "@/api/relationships.api";
-import type { UserStatus } from "@/types/userStatus";
+import { useEffect, useState } from 'react';
+import { Rabbit, Search, UsersRound } from 'lucide-react';
+import FriendListItem from '@/components/friends/FriendListItem';
+import SidebarNavTab from '@/components/friends/SidebarNavTab';
+import UserControlCard from '@/components/friends/UserControlCard';
+import { getPendingFriendRequestCount } from '@/api/relationships.api';
+import type { UserStatus } from '@/types/userStatus';
 
 const friendItems: Array<{ id: number; name: string; status: UserStatus }> = [
   {
     id: 1,
-    name: "Théo",
+    name: 'Théo',
     status: {
-      presence: "online",
-      customStatus: "Playing Visual Studio Code",
-      platform: "desktop",
+      presence: 'online',
+      customStatus: 'Playing Visual Studio Code',
+      platform: 'desktop',
     },
   },
   {
     id: 2,
-    name: "Eliott",
+    name: 'testuser',
     status: {
-      presence: "online",
-      platform: "web",
+      presence: 'online',
+      platform: 'web',
     },
   },
   {
     id: 3,
-    name: "Excalibur//",
+    name: 'eliott.now',
     status: {
-      presence: "dnd",
-      platform: "desktop",
+      presence: 'dnd',
+      platform: 'desktop',
     },
   },
   {
     id: 4,
-    name: "Jerry",
+    name: 'Jerry',
     status: {
-      presence: "away",
-      platform: "mobile",
+      presence: 'away',
+      platform: 'mobile',
     },
   },
   {
     id: 5,
-    name: "Bugatti",
+    name: 'Bugatti',
     status: {
-      presence: "offline",
+      presence: 'offline',
     },
   },
   {
     id: 6,
-    name: "Izuku",
+    name: 'Izuku',
     status: {
-      presence: "online",
-      customStatus: "Playing Valorant",
-      platform: "desktop",
+      presence: 'online',
+      customStatus: 'Playing Valorant',
+      platform: 'desktop',
     },
   },
   {
     id: 7,
-    name: "Chakal98",
+    name: 'Chakal98',
     status: {
-      presence: "offline",
+      presence: 'offline',
     },
   },
   {
     id: 8,
-    name: "EasternBunny913",
+    name: 'EasternBunny913',
     status: {
-      presence: "offline",
+      presence: 'offline',
     },
   },
   {
     id: 9,
-    name: "Hichlocal",
+    name: 'Hichlocal',
     status: {
-      presence: "offline",
+      presence: 'offline',
     },
   },
 ];
@@ -106,41 +106,16 @@ export default function FriendsSidebar() {
     <aside className="w-72 bg-darkblue-400 border-r border-input-primary-default-border flex flex-col gap-4 p-4">
       <label className="relative flex items-center gap-2 bg-neutral-lowest border border-input-primary-default-border rounded-md px-3 py-2">
         <Search size={16} className="text-input-primary-default-icon" />
-        <input
-          type="text"
-          placeholder="Search for a conversation"
-          className="w-full bg-transparent text-sm text-input-primary-default-text placeholder:text-input-primary-default-placeholder outline-none"
-        />
+        <input type="text" placeholder="Search for a conversation" className="w-full bg-transparent text-sm text-input-primary-default-text placeholder:text-input-primary-default-placeholder outline-none" />
       </label>
       <div className="flex flex-col gap-2 flex-1">
         <div className="tabs mt-2 mb-4 flex flex-col gap-2">
-          <SidebarNavTab
-            to="/friends/addfriend"
-            label="Friends"
-            icon={UsersRound}
-            badgeCount={
-              typeof pendingCount === "number" && pendingCount > 0
-                ? pendingCount
-                : undefined
-            }
-          />
-          <SidebarNavTab
-            to="/dynamite"
-            label="Dynamite"
-            icon={Rabbit}
-          />
+          <SidebarNavTab to="/friends/addfriend" label="Friends" icon={UsersRound} badgeCount={typeof pendingCount === 'number' && pendingCount > 0 ? pendingCount : undefined} />
+          <SidebarNavTab to="/dynamite" label="Dynamite" icon={Rabbit} />
         </div>
-        <span className="text-xs font-semibold uppercase text-neutral-medium tracking-wider px-2">
-          Direct Messages
-        </span>
+        <span className="text-xs font-semibold uppercase text-neutral-medium tracking-wider px-2">Direct Messages</span>
         {friendItems.map((friend) => (
-          <FriendListItem
-            key={friend.id}
-            name={friend.name}
-            status={friend.status}
-            to={dmPathFor(friend.name)}
-            isActive={false}
-          />
+          <FriendListItem key={friend.id} name={friend.name} status={friend.status} to={dmPathFor(friend.name)} isActive={false} />
         ))}
       </div>
       <UserControlCard />
