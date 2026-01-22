@@ -13,22 +13,24 @@ export const app = fastify({
   logger: true,
 });
 
+const clientOrigin = process.env.CLIENT_ORIGIN ?? "http://localhost:5173";
+
 // cors policy
 await app.register(cors, {
-  origin: ["http://localhost:5173"],
+  origin: [clientOrigin],
   credentials: true,
-})
+});
 
 await app.register(formbody);
-
-await app.register(prismaPlugin);
-await app.register(authPlugin)
-await app.register(socketPlugin)
 
 app.register(cookie, {
   secret: process.env.COOKIE_SECRET,
   parseOptions: {},
 });
+
+await app.register(prismaPlugin);
+await app.register(authPlugin);
+await app.register(socketPlugin);
 
 // signup completion route
 await app.register(signupRoutes, { prefix: "/auth" });
@@ -41,7 +43,8 @@ await app.register(relationshipRoutes, { prefix: "/api/relationships" });
 
 // Error hanlder
 app.setErrorHandler((error: FastifyError, request, reply) => {
-  reply.status(error.statusCode || 400).send({
+  request.log.error(error);
+  reply.status(error.statusCode || 500).send({
     error: "Une erreur est survenue",
   });
 });
