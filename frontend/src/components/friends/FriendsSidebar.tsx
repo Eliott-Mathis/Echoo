@@ -1,106 +1,64 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Rabbit, Search, UsersRound } from 'lucide-react';
 import FriendListItem from '@/components/friends/FriendListItem';
 import SidebarNavTab from '@/components/friends/SidebarNavTab';
 import UserControlCard from '@/components/friends/UserControlCard';
-import { getPendingFriendRequestCount } from '@/api/relationships.api';
-import type { UserStatus } from '@/types/userStatus';
-
-const friendItems: Array<{ id: number; name: string; status: UserStatus }> = [
-  {
-    id: 1,
-    name: 'Théo',
-    status: {
-      presence: 'online',
-      customStatus: 'Playing Visual Studio Code',
-      platform: 'desktop',
-    },
-  },
-  {
-    id: 2,
-    name: 'testuser',
-    status: {
-      presence: 'online',
-      platform: 'web',
-    },
-  },
-  {
-    id: 3,
-    name: 'eliott.now',
-    status: {
-      presence: 'dnd',
-      platform: 'desktop',
-    },
-  },
-  {
-    id: 4,
-    name: 'Jerry',
-    status: {
-      presence: 'away',
-      platform: 'mobile',
-    },
-  },
-  {
-    id: 5,
-    name: 'Bugatti',
-    status: {
-      presence: 'offline',
-    },
-  },
-  {
-    id: 6,
-    name: 'Izuku',
-    status: {
-      presence: 'online',
-      customStatus: 'Playing Valorant',
-      platform: 'desktop',
-    },
-  },
-  {
-    id: 7,
-    name: 'Chakal98',
-    status: {
-      presence: 'offline',
-    },
-  },
-  {
-    id: 8,
-    name: 'EasternBunny913',
-    status: {
-      presence: 'offline',
-    },
-  },
-  {
-    id: 9,
-    name: 'Hichlocal',
-    status: {
-      presence: 'offline',
-    },
-  },
-];
+import { getFriends, getPendingFriendRequestCount } from '@/api/relationships.api';
+import type { RelationshipUser } from '@/types/relationships';
+import socket from '@/lib/socket';
+import { toUserStatus } from '@/lib/relationshipUtils';
 
 export default function FriendsSidebar() {
   const dmPathFor = (name: string) => `/messages/${encodeURIComponent(name)}`;
   const [pendingCount, setPendingCount] = useState<number | null>(null);
+  const [friends, setFriends] = useState<RelationshipUser[]>([]);
+
+  const loadPendingCount = useCallback(async () => {
+    try {
+      const count = await getPendingFriendRequestCount();
+      setPendingCount(count);
+    } catch {
+      setPendingCount(null);
+    }
+  }, []);
+
+  const loadFriends = useCallback(async () => {
+    try {
+      const data = await getFriends();
+      setFriends(data);
+    } catch {
+      setFriends([]);
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
 
-    const loadPendingCount = async () => {
-      try {
-        const count = await getPendingFriendRequestCount();
-        if (isMounted) setPendingCount(count);
-      } catch {
-        if (isMounted) setPendingCount(null);
-      }
+    const bootstrap = async () => {
+      await Promise.all([loadPendingCount(), loadFriends()]);
     };
 
-    loadPendingCount();
+    const handlePendingUpdate = () => {
+      if (!isMounted) return;
+      loadPendingCount();
+    };
+
+    const handleFriendsUpdate = () => {
+      if (!isMounted) return;
+      loadFriends();
+    };
+
+    bootstrap();
+
+    socket.on('friend:pending-updated', handlePendingUpdate);
+    socket.on('friend:list-updated', handleFriendsUpdate);
 
     return () => {
       isMounted = false;
+      socket.off('friend:pending-updated', handlePendingUpdate);
+      socket.off('friend:list-updated', handleFriendsUpdate);
     };
-  }, []);
+  }, [loadFriends, loadPendingCount]);
 
   return (
     <aside className="w-72 bg-darkblue-400 border-r border-input-primary-default-border flex flex-col gap-4 p-4">
@@ -114,9 +72,7 @@ export default function FriendsSidebar() {
           <SidebarNavTab to="/dynamite" label="Dynamite" icon={Rabbit} />
         </div>
         <span className="text-xs font-semibold uppercase text-neutral-medium tracking-wider px-2">Direct Messages</span>
-        {friendItems.map((friend) => (
-          <FriendListItem key={friend.id} name={friend.name} status={friend.status} to={dmPathFor(friend.name)} isActive={false} />
-        ))}
+        {friends.length === 0 ? <span className="text-xs text-neutral-medium px-2">No friends yet.</span> : friends.map((friend) => <FriendListItem key={friend.id} name={friend.displayName || friend.username} status={toUserStatus(friend.status, friend.customStatus)} avatarUrl={friend.avatarUrl ?? undefined} to={dmPathFor(friend.username)} isActive={false} />)}
       </div>
       <UserControlCard />
     </aside>
