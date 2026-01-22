@@ -9,7 +9,7 @@ export default function DirectMessageItem({
 }) {
   if (!showMeta) {
     return (
-      <div className="pl-[52px]">
+      <div className="pl-13">
         <p className="text-base text-input-primary-default-text">
           {message.content}
         </p>
