@@ -4,6 +4,9 @@ import DirectMessageComposer from "../../components/messages/DirectMessageCompos
 import DirectMessageHeader from "../../components/messages/DirectMessageHeader";
 import DirectMessageList from "../../components/messages/DirectMessageList";
 import type { DirectMessage } from "../../types/messages";
+import { useState } from "react";
+import CallBanner from "@/components/messages/CallBanner";
+import { useCallStore } from "@/stores/callStore";
 
 type DirectMessageRouteParams = {
   username?: string;
@@ -11,6 +14,7 @@ type DirectMessageRouteParams = {
 
 export default function DirectMessageTab() {
   const { username } = useParams<DirectMessageRouteParams>();
+  const {  } = useCallStore();
 
   const icons = {
     gift: Gift,
@@ -52,6 +56,7 @@ export default function DirectMessageTab() {
       {username ? (
         <div className="w-full flex flex-col gap-6 h-full min-h-0">
           <DirectMessageHeader username={username} />
+          <CallBanner username={username}/>
           <DirectMessageList messages={messages} />
           <DirectMessageComposer username={username} icons={icons} />
         </div>
